@@ -6,12 +6,23 @@ const integrationStyles = `
 }
 
 .partial-derivatives-guide .sidebar {
-  top: 58px;
-  height: calc(100vh - 58px);
+  top: 64px;
+  height: calc(100vh - 64px);
 }
 
 .vector-calculus-guide nav {
-  top: 58px;
+  top: 64px;
+}
+
+.partial-derivatives-guide .main,
+.vector-calculus-guide > div > main {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+@media (max-width: 920px) {
+  .vector-calculus-guide nav {
+    top: 0;
+  }
 }
 `;
 
