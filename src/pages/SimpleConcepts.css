@@ -121,6 +121,8 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
   min-height: 218px;
   padding: 1.25rem;
 }
@@ -152,8 +154,33 @@
 
 .concept-card p {
   color: var(--muted);
+  flex: 1;
   line-height: 1.7;
   margin: 0;
+}
+
+.concept-card-action {
+  align-items: center;
+  align-self: flex-start;
+  background: var(--teal);
+  border: 1px solid var(--teal);
+  border-radius: 999px;
+  color: white;
+  display: inline-flex;
+  font-size: 0.88rem;
+  font-weight: 900;
+  justify-content: center;
+  margin-top: 1rem;
+  min-height: 40px;
+  padding: 0.45rem 0.85rem;
+  text-decoration: none;
+}
+
+.concept-card-action:hover,
+.concept-card-action:focus-visible {
+  background: #245d56;
+  border-color: #245d56;
+  color: white;
 }
 
 .self-reading-panel {

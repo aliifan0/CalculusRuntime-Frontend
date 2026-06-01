@@ -11,6 +11,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AISolver from "./pages/AISolver";
 import SimpleConcepts from "./pages/SimpleConcepts";
+import ConceptExplore from "./pages/ConceptExplore";
 
 // Guide parts
 import PartialPart1 from "./pages/PartialPart1";
@@ -40,6 +41,7 @@ function App() {
             {/* AI Solver */}
             <Route path="/ai-solver" element={<Layout body={<AISolver />} />} />
             <Route path="/simple-concepts" element={<Layout body={<SimpleConcepts />} />} />
+            <Route path="/simple-concepts/:slug" element={<Layout body={<ConceptExplore />} />} />
 
             {/* Partial Derivatives — split into 2 parts */}
             <Route path="/partial-derivatives" element={<Navigate to="/partial-derivatives/1" replace />} />

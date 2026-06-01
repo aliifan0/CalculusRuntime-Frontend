@@ -1,19 +1,36 @@
+import { Link } from "react-router-dom";
 import "./SimpleConcepts.css";
+import { InlineMath } from "../components/Math";
 
-const conceptGroups = [
+const M = ({ latex }) => <InlineMath latex={latex} />;
+
+export const getConceptSlug = (title) =>
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+export const conceptGroups = [
   {
     kicker: "Before multivariable calculus",
     title: "Functions, dimensions, continuity, and derivatives",
     items: [
       {
         title: "Dimension theory of real-valued functions",
-        body:
-          "A real-valued function gives one real number as its answer. The number of inputs tells you the dimension of the input space: f(x) uses a line, f(x, y) uses a plane, and f(x, y, z) uses space. The output is still one number, so you can think of the function as assigning a height, temperature, cost, or density to every allowed input point.",
+        body: (
+          <>
+            A real-valued function gives one real number as its answer. The number of inputs tells you the dimension of the input space: <M latex="f(x)" /> uses a line,{" "}
+            <M latex="f(x,y)" /> uses a plane, and <M latex="f(x,y,z)" /> uses space. The output is still one number, so you can think of the function as assigning a height, temperature, cost, or density to every allowed input point.
+          </>
+        ),
       },
       {
         title: "Continuity using the epsilon-delta idea",
-        body:
-          "Continuity means small changes in the input create small changes in the output. In epsilon-delta language, epsilon is the output error you are willing to allow, and delta is the input distance you must stay within to keep the output error below epsilon.",
+        body: (
+          <>
+            Continuity means small changes in the input create small changes in the output. In <M latex="\\epsilon" />-<M latex="\\delta" /> language, <M latex="\\epsilon" /> is the output error you are willing to allow, and <M latex="\\delta" /> is the input distance you must stay within to keep the output error below <M latex="\\epsilon" />.
+          </>
+        ),
       },
       {
         title: "Differentiability in one variable",
@@ -22,8 +39,11 @@ const conceptGroups = [
       },
       {
         title: "Tangent lines and extreme values",
-        body:
-          "A tangent line is the best straight-line picture of a curve near one point. Extreme values are highs and lows. In one variable, candidates often occur where f'(x) = 0, where f'(x) does not exist, or at endpoints of the interval.",
+        body: (
+          <>
+            A tangent line is the best straight-line picture of a curve near one point. Extreme values are highs and lows. In one variable, candidates often occur where <M latex="f'(x)=0" />, where <M latex="f'(x)" /> does not exist, or at endpoints of the interval.
+          </>
+        ),
         selfStudy: true,
       },
     ],
@@ -34,13 +54,20 @@ const conceptGroups = [
     items: [
       {
         title: "What a quadric surface is",
-        body:
-          "A quadric surface is a 3D shape described by an equation with squared terms such as x^2, y^2, and z^2. The signs and missing variables in the equation tell you the surface type.",
+        body: (
+          <>
+            A quadric surface is a 3D shape described by an equation with squared terms such as <M latex="x^2" />,{" "}
+            <M latex="y^2" />, and <M latex="z^2" />. The signs and missing variables in the equation tell you the surface type.
+          </>
+        ),
       },
       {
         title: "Ellipsoids",
-        body:
-          "An ellipsoid is like a stretched sphere. A typical form is x^2/a^2 + y^2/b^2 + z^2/c^2 = 1. All squared terms are positive, so the surface is closed and bounded.",
+        body: (
+          <>
+            An ellipsoid is like a stretched sphere. A typical form is <M latex="\\frac{x^2}{a^2}+\\frac{y^2}{b^2}+\\frac{z^2}{c^2}=1" />. All squared terms are positive, so the surface is closed and bounded.
+          </>
+        ),
       },
       {
         title: "Hyperboloids",
@@ -49,13 +76,19 @@ const conceptGroups = [
       },
       {
         title: "Cylinders",
-        body:
-          "A cylinder appears when one variable is missing. For example, x^2 + y^2 = 9 says nothing about z, so the circle is extended upward and downward forever.",
+        body: (
+          <>
+            A cylinder appears when one variable is missing. For example, <M latex="x^2+y^2=9" /> says nothing about <M latex="z" />, so the circle is extended upward and downward forever.
+          </>
+        ),
       },
       {
         title: "Paraboloids",
-        body:
-          "A paraboloid uses squared terms in some variables and a first-power term in another. z = x^2 + y^2 is a bowl. z = x^2 - y^2 is a saddle-shaped hyperbolic paraboloid.",
+        body: (
+          <>
+            A paraboloid uses squared terms in some variables and a first-power term in another. <M latex="z=x^2+y^2" /> is a bowl. <M latex="z=x^2-y^2" /> is a saddle-shaped hyperbolic paraboloid.
+          </>
+        ),
       },
     ],
   },
@@ -65,8 +98,11 @@ const conceptGroups = [
     items: [
       {
         title: "Functions of several variables",
-        body:
-          "These functions depend on more than one input. For example, f(x, y) might describe the height of land at a map location, while f(x, y, z) might describe temperature at a point in a room.",
+        body: (
+          <>
+            These functions depend on more than one input. For example, <M latex="f(x,y)" /> might describe the height of land at a map location, while <M latex="f(x,y,z)" /> might describe temperature at a point in a room.
+          </>
+        ),
       },
       {
         title: "Limits in higher dimensions",
@@ -80,8 +116,11 @@ const conceptGroups = [
       },
       {
         title: "Linearization and differentials",
-        body:
-          "Linearization replaces a complicated function near a point with a simple linear formula. Differentials estimate small changes: if x and y change a little, the differential estimates how much f changes.",
+        body: (
+          <>
+            Linearization replaces a complicated function near a point with a simple linear formula. Differentials estimate small changes: if <M latex="x" /> and <M latex="y" /> change a little, the differential estimates how much <M latex="f" /> changes.
+          </>
+        ),
         selfStudy: true,
       },
       {
@@ -98,8 +137,11 @@ const conceptGroups = [
     items: [
       {
         title: "Partial derivatives",
-        body:
-          "A partial derivative measures change in one direction while temporarily holding the other variables fixed. For f(x, y), f_x looks left-right and f_y looks front-back.",
+        body: (
+          <>
+            A partial derivative measures change in one direction while temporarily holding the other variables fixed. For <M latex="f(x,y)" />, <M latex="f_x" /> looks left-right and <M latex="f_y" /> looks front-back.
+          </>
+        ),
       },
       {
         title: "Chain rule",
@@ -123,8 +165,11 @@ const conceptGroups = [
       },
       {
         title: "Extreme values and saddle points",
-        body:
-          "For f(x, y), local maxima and minima are high and low spots on a surface. A saddle point rises in one direction and falls in another, so it is not a true maximum or minimum.",
+        body: (
+          <>
+            For <M latex="f(x,y)" />, local maxima and minima are high and low spots on a surface. A saddle point rises in one direction and falls in another, so it is not a true maximum or minimum.
+          </>
+        ),
       },
     ],
   },
@@ -140,8 +185,11 @@ const conceptGroups = [
       },
       {
         title: "Double integrals over rectangles",
-        body:
-          "A double integral over a rectangle adds up values across a flat rectangular region. If f(x, y) is height, the integral gives volume under the surface above that rectangle.",
+        body: (
+          <>
+            A double integral over a rectangle adds up values across a flat rectangular region. If <M latex="f(x,y)" /> is height, the integral gives volume under the surface above that rectangle.
+          </>
+        ),
       },
       {
         title: "Iterated integrals",
@@ -150,23 +198,35 @@ const conceptGroups = [
       },
       {
         title: "Double integrals over general regions",
-        body:
-          "General regions are not always rectangles, so the bounds may depend on x or y. The main skill is describing the region correctly before integrating.",
+        body: (
+          <>
+            General regions are not always rectangles, so the bounds may depend on <M latex="x" /> or <M latex="y" />. The main skill is describing the region correctly before integrating.
+          </>
+        ),
       },
       {
         title: "Area by double integration",
-        body:
-          "If you integrate 1 over a region, every tiny piece contributes only its area. Adding all those pieces gives the total area of the region.",
+        body: (
+          <>
+            If you integrate <M latex="1" /> over a region, every tiny piece contributes only its area. Adding all those pieces gives the total area of the region.
+          </>
+        ),
       },
       {
         title: "Double integrals in polar form",
-        body:
-          "Polar coordinates use radius r and angle theta. They are useful for circles and circular sectors. The area piece becomes r dr dtheta, so the extra r must be included.",
+        body: (
+          <>
+            Polar coordinates use radius <M latex="r" /> and angle <M latex="\\theta" />. They are useful for circles and circular sectors. The area piece becomes <M latex="r\\,dr\\,d\\theta" />, so the extra <M latex="r" /> must be included.
+          </>
+        ),
       },
       {
         title: "Triple integrals in rectangular coordinates",
-        body:
-          "A triple integral adds values throughout a 3D solid using x, y, and z. If the function is density, the triple integral can give total mass; if the function is 1, it gives volume.",
+        body: (
+          <>
+            A triple integral adds values throughout a 3D solid using <M latex="x" />, <M latex="y" />, and <M latex="z" />. If the function is density, the triple integral can give total mass; if the function is <M latex="1" />, it gives volume.
+          </>
+        ),
       },
     ],
   },
@@ -223,6 +283,9 @@ function SimpleConcepts() {
                 {item.selfStudy && <span className="self-study-tag">Self-reading</span>}
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
+                <Link className="concept-card-action" to={`/simple-concepts/${getConceptSlug(item.title)}`}>
+                  Explore more
+                </Link>
               </article>
             ))}
           </div>
