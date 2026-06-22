@@ -1,0 +1,70 @@
+.scb-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem 1.4rem;
+  margin: 2.5rem auto;
+  max-width: 1000px;
+}
+
+.scb-wrap--done {
+  background: rgba(47, 116, 107, 0.08);
+  border-color: var(--teal);
+}
+
+.scb-wrap--guest {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.scb-wrap--guest a {
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.scb-wrap--guest a:hover {
+  text-decoration: underline;
+}
+
+.scb-done-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.scb-mark-btn {
+  background: var(--teal);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.55rem 1.2rem;
+  transition: opacity 0.15s;
+}
+
+.scb-mark-btn:hover {
+  opacity: 0.85;
+}
+
+.scb-next {
+  background: var(--gold);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.55rem 1.2rem;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.scb-next:hover {
+  opacity: 0.85;
+}

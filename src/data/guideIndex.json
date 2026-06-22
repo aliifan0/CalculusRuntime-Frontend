@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Partial Derivatives — Functions, Limits & Partial Derivatives",
+    "path": "/partial-derivatives/1",
+    "excerpt": "Definitions and examples for functions of several variables, limits, continuity, and partial derivatives."
+  },
+  {
+    "title": "Partial Derivatives — Chain Rule & Extrema",
+    "path": "/partial-derivatives/2",
+    "excerpt": "Chain rule for multivariable functions and techniques for finding extrema with and without constraints."
+  },
+  {
+    "title": "Vector Calculus — Part 1",
+    "path": "/vector-calculus/1",
+    "excerpt": "Vector-valued functions, gradients, divergence and curl; line integrals and basic theorems."
+  },
+  {
+    "title": "Vector Calculus — Part 2",
+    "path": "/vector-calculus/2",
+    "excerpt": "Surface integrals, flux, Green's and Stokes' theorems, and applications."
+  },
+  {
+    "title": "Limits & Continuity — Part 1",
+    "path": "/limits-continuity/1",
+    "excerpt": "Multivariable limits, path-dependence, and continuity concepts with worked examples."
+  },
+  {
+    "title": "Multiple Integrals — Part 1",
+    "path": "/multiple-integrals/1",
+    "excerpt": "Double integrals over rectangles, Fubini's theorem, and change to polar coordinates."
+  }
+]

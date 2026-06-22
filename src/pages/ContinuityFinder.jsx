@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as math from 'mathjs';
 import { latexToMathJs } from 'crosstex';
+import { InlineMath, renderLatexToElement } from '../components/Math';
 
 const ContinuityFinder = () => {
     const [variables, setVariables] = useState([{ name: 'x', value: '0' }, { name: 'y', value: '0' }]);
@@ -56,34 +57,25 @@ const ContinuityFinder = () => {
 
     // Render KaTeX for demo examples
     useEffect(() => {
-        if (window.katex) {
-            demoExamples.forEach((example) => {
-                const el = document.getElementById(`demo-${example.num}`);
-                if (el) {
-                    try {
-                        window.katex.render(example.latex, el, { throwOnError: false });
-                    } catch {
-                        el.textContent = example.latex;
-                    }
-                }
-            });
-        }
+        demoExamples.forEach((example) => {
+            renderLatexToElement(
+                document.getElementById(`demo-${example.num}`),
+                example.latex
+            );
+        });
     }, [demoExamples]);
 
     // Render KaTeX for solution steps
     useEffect(() => {
-        if (window.katex && steps.length > 0) {
-            steps.forEach((step, index) => {
-                const el = document.getElementById(`step-math-${index}`);
-                if (el && step.math) {
-                    try {
-                        window.katex.render(step.math, el, { throwOnError: false, displayMode: true });
-                    } catch {
-                        el.textContent = step.math;
-                    }
-                }
-            });
-        }
+        steps.forEach((step, index) => {
+            if (step.math) {
+                renderLatexToElement(
+                    document.getElementById(`step-math-${index}`),
+                    step.math,
+                    { displayMode: true }
+                );
+            }
+        });
     }, [steps]);
 
     // Scroll to results
@@ -153,6 +145,18 @@ const ContinuityFinder = () => {
         setTimeout(() => setToast({ show: false, message: '' }), 2000);
     };
 
+    const renderExplanation = (text) => {
+        const parts = String(text).split(/(\\\(.+?\\\))/g);
+
+        return parts.map((part, index) => {
+            if (part.startsWith('\\(') && part.endsWith('\\)')) {
+                return <InlineMath key={index} latex={part.slice(2, -2)} />;
+            }
+
+            return <React.Fragment key={index}>{part}</React.Fragment>;
+        });
+    };
+
     const addVariable = () => {
         const nextVarChar = String.fromCharCode(120 + variables.length);
         setVariables([...variables, { name: nextVarChar, value: '0' }]);
@@ -207,9 +211,9 @@ const ContinuityFinder = () => {
             const lnMatch = latex.match(/\\ln\(([^)]+)\)/) || latex.match(/\\ln\{([^}]+)\}/);
             if (lnMatch) {
                 const arg = lnMatch[1];
-                explanation = `The natural logarithm requires its argument to be positive: ${arg} > 0`;
+                explanation = `The natural logarithm requires its argument to be positive: \\(${arg} > 0\\)`;
                 domainLatex = `\\{(${vars.map(v => v.name).join(',')}) : ${arg} > 0\\}`;
-                continuityExplanation = `The function is continuous wherever ${arg} > 0`;
+                continuityExplanation = `The function is continuous wherever \\(${arg} > 0\\)`;
                 continuityCondition = arg + ' > 0';
             }
         }
@@ -220,9 +224,9 @@ const ContinuityFinder = () => {
             const sqrtMatch = latex.match(/\\sqrt\{([^}]+)\}/);
             if (sqrtMatch) {
                 const arg = sqrtMatch[1];
-                explanation = `The square root requires its argument to be non-negative: ${arg} ≥ 0`;
+                explanation = `The square root requires its argument to be non-negative: \\(${arg} \\geq 0\\)`;
                 domainLatex = `\\{(${vars.map(v => v.name).join(',')}) : ${arg} \\geq 0\\}`;
-                continuityExplanation = `The function is continuous wherever ${arg} ≥ 0`;
+                continuityExplanation = `The function is continuous wherever \\(${arg} \\geq 0\\)`;
                 continuityCondition = arg + ' \\geq 0';
             }
         }
@@ -233,9 +237,9 @@ const ContinuityFinder = () => {
             const fracMatch = latex.match(/\\frac\{[^}]+\}\{([^}]+)\}/);
             if (fracMatch) {
                 const denom = fracMatch[1];
-                explanation = `The denominator cannot be zero: ${denom} ≠ 0`;
+                explanation = `The denominator cannot be zero: \\(${denom} \\neq 0\\)`;
                 domainLatex = `\\{(${vars.map(v => v.name).join(',')}) : ${denom} \\neq 0\\}`;
-                continuityExplanation = `The function is continuous wherever ${denom} ≠ 0`;
+                continuityExplanation = `The function is continuous wherever \\(${denom} \\neq 0\\)`;
                 continuityCondition = denom + ' \\neq 0';
             }
         }
@@ -253,9 +257,9 @@ const ContinuityFinder = () => {
                 if (match && !restrictions.includes('fraction')) {
                     restrictions.push('division');
                     const divisor = match[1];
-                    explanation = `Division requires ${divisor} ≠ 0`;
+                    explanation = `Division requires \\(${divisor} \\neq 0\\)`;
                     domainLatex = `\\{(${vars.map(v => v.name).join(',')}) : ${divisor} \\neq 0\\}`;
-                    continuityExplanation = `The function is continuous wherever ${divisor} ≠ 0`;
+                    continuityExplanation = `The function is continuous wherever \\(${divisor} \\neq 0\\)`;
                     continuityCondition = divisor + ' \\neq 0';
                 }
             }
@@ -264,7 +268,7 @@ const ContinuityFinder = () => {
         // If no restrictions found
         if (restrictions.length === 0) {
             explanation = 'This function is composed of continuous elementary functions (polynomials, trigonometric functions, exponentials)';
-            continuityExplanation = `The function is continuous everywhere in its domain (all of ℝ${vars.length > 1 ? '^' + vars.length : ''})`;
+            continuityExplanation = `The function is continuous everywhere in its domain (all of \\(\\mathbb{R}${vars.length > 1 ? `^${vars.length}` : ''}\\))`;
             continuityCondition = '\\text{Continuous everywhere}';
         }
 
@@ -284,6 +288,7 @@ const ContinuityFinder = () => {
             vars.forEach(v => {
                 scope[v.name] = evaluateSpecialValue(v.value);
             });
+            const pointText = vars.map(v => `\\(${v.name}=${v.value}\\)`).join(', ');
 
             // Try to evaluate at the point
             const valueAtPoint = math.evaluate(expr, scope);
@@ -291,26 +296,27 @@ const ContinuityFinder = () => {
             if (typeof valueAtPoint === 'number' && isFinite(valueAtPoint)) {
                 return {
                     isContinuous: true,
-                    explanation: `At point (${vars.map(v => `${v.name}=${v.value}`).join(', ')}), the function equals ${valueAtPoint.toFixed(4)}. The function is defined and finite at this point.`,
+                    explanation: `At point (${pointText}), the function equals \\(${valueAtPoint.toFixed(4)}\\). The function is defined and finite at this point.`,
                     math: `f(${vars.map(v => v.value).join(',')}) = ${valueAtPoint.toFixed(4)}`
                 };
             } else if (valueAtPoint === Infinity || valueAtPoint === -Infinity) {
                 return {
                     isContinuous: false,
-                    explanation: `At point (${vars.map(v => `${v.name}=${v.value}`).join(', ')}), the function approaches infinity. The function is not continuous at this point.`,
+                    explanation: `At point (${pointText}), the function approaches infinity. The function is not continuous at this point.`,
                     math: `f(${vars.map(v => v.value).join(',')}) = ${valueAtPoint === Infinity ? '\\infty' : '-\\infty'}`
                 };
             } else {
                 return {
                     isContinuous: false,
-                    explanation: `At point (${vars.map(v => `${v.name}=${v.value}`).join(', ')}), the function is undefined.`,
+                    explanation: `At point (${pointText}), the function is undefined.`,
                     math: `f(${vars.map(v => v.value).join(',')}) = \\text{undefined}`
                 };
             }
         } catch (error) {
+            const pointText = vars.map(v => `\\(${v.name}=${v.value}\\)`).join(', ');
             return {
                 isContinuous: false,
-                explanation: `At point (${vars.map(v => `${v.name}=${v.value}`).join(', ')}), the function is undefined or has a discontinuity.`,
+                explanation: `At point (${pointText}), the function is undefined or has a discontinuity.`,
                 math: `f(${vars.map(v => v.value).join(',')}) = \\text{undefined}`
             };
         }
@@ -322,8 +328,8 @@ const ContinuityFinder = () => {
             return {
                 isContinuous: continuityResult.isContinuous ? 'Continuous' : 'Discontinuous',
                 explanation: continuityResult.isContinuous
-                    ? `The function is continuous at the point (${vars.map(v => `${v.name}=${v.value}`).join(', ')}).`
-                    : `The function is NOT continuous at the point (${vars.map(v => `${v.name}=${v.value}`).join(', ')}).`,
+                    ? `The function is continuous at the point (${vars.map(v => `\\(${v.name}=${v.value}\\)`).join(', ')}).`
+                    : `The function is NOT continuous at the point (${vars.map(v => `\\(${v.name}=${v.value}\\)`).join(', ')}).`,
                 math: continuityResult.math
             };
         } else {
@@ -362,7 +368,7 @@ const ContinuityFinder = () => {
             // Step 1: Function identification
             analysisSteps.push({
                 title: 'Step 1: Function Analysis',
-                explanation: `Analyzing f(${variables.map(v => v.name).join(',')}) = ${latex}`,
+                explanation: `Analyzing \\(f(${variables.map(v => v.name).join(',')}) = ${latex}\\)`,
                 math: latex
             });
 
@@ -413,17 +419,30 @@ const ContinuityFinder = () => {
     return (
         <div className="app-body">
             <style>{`
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-
                 .app-body {
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    --continuity-ink: #111317;
+                    --continuity-muted: #665f56;
+                    --continuity-paper: #fbf7ef;
+                    --continuity-card: #fffdf8;
+                    --continuity-line: #ded2bf;
+                    --continuity-teal: #2f746b;
+                    --continuity-blue: #314e73;
+                    --continuity-gold: #c28a2e;
+                    --continuity-plum: #6b4262;
+                    --continuity-soft: #f4eee5;
+                    --continuity-shadow: 0 18px 52px rgba(28, 24, 18, 0.13);
+                    --continuity-shadow-sm: 0 8px 24px rgba(28, 24, 18, 0.08);
+                    background:
+                        radial-gradient(circle at 84% 8%, rgba(107, 66, 98, 0.12), transparent 26rem),
+                        radial-gradient(circle at 8% 18%, rgba(47, 116, 107, 0.14), transparent 24rem),
+                        linear-gradient(90deg, rgba(49, 78, 115, 0.08) 1px, transparent 1px),
+                        linear-gradient(180deg, rgba(49, 78, 115, 0.06) 1px, transparent 1px),
+                        var(--continuity-paper);
+                    background-size: auto, auto, 44px 44px, 44px 44px, auto;
+                    color: var(--continuity-ink);
+                    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
                     min-height: 100vh;
-                    padding: 20px;
+                    padding: clamp(1rem, 4vw, 3rem);
                 }
 
                 .app-container {
@@ -432,314 +451,384 @@ const ContinuityFinder = () => {
                 }
 
                 .app-title {
-                    text-align: center;
-                    color: white;
-                    font-size: 3em;
+                    color: #15100c;
+                    font-family: Georgia, "Times New Roman", serif;
+                    font-size: clamp(2.2rem, 6vw, 4.6rem);
                     font-weight: 700;
-                    margin-bottom: 10px;
-                    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+                    letter-spacing: 0;
+                    line-height: 1;
+                    margin: 0;
+                    text-align: center;
                 }
 
                 .app-subtitle {
+                    color: var(--continuity-muted);
+                    font-size: clamp(1rem, 2vw, 1.18rem);
+                    line-height: 1.65;
+                    margin: 0.9rem auto 2.4rem;
+                    max-width: 660px;
                     text-align: center;
-                    color: rgba(255, 255, 255, 0.9);
-                    font-size: 1.2em;
-                    margin-bottom: 40px;
+                }
+
+                .app-subtitle::before {
+                    background: linear-gradient(90deg, var(--continuity-teal), var(--continuity-gold), var(--continuity-blue));
+                    border-radius: 999px;
+                    content: "";
+                    display: block;
+                    height: 3px;
+                    margin: 0 auto 1.2rem;
+                    width: min(220px, 50vw);
+                }
+
+                .demo-section,
+                .input-section,
+                .result-section {
+                    background: rgba(255, 253, 248, 0.9);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    box-shadow: var(--continuity-shadow);
+                    overflow: hidden;
+                    position: relative;
+                }
+
+                .demo-section::before,
+                .input-section::before,
+                .result-section::before {
+                    background: linear-gradient(90deg, var(--continuity-teal), var(--continuity-gold), var(--continuity-plum));
+                    content: "";
+                    height: 4px;
+                    inset: 0 0 auto;
+                    position: absolute;
                 }
 
                 .demo-section {
-                    background: white;
-                    border-radius: 20px;
-                    padding: 30px;
-                    margin-bottom: 30px;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                    margin-bottom: 1.2rem;
+                    padding: clamp(1.1rem, 3vw, 1.8rem);
                 }
 
                 .section-title {
-                    font-size: 1.8em;
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 20px;
-                    text-align: center;
+                    color: #15100c;
+                    font-family: Georgia, "Times New Roman", serif;
+                    font-size: clamp(1.45rem, 3vw, 2rem);
+                    font-weight: 700;
+                    margin: 0 0 1.2rem;
                 }
 
                 .category-section {
-                    margin-bottom: 30px;
+                    margin-top: 1.2rem;
                 }
 
                 .category-title {
-                    font-size: 1.3em;
-                    font-weight: 600;
-                    color: #667eea;
-                    margin-bottom: 15px;
-                    padding-bottom: 8px;
-                    border-bottom: 2px solid #667eea;
+                    align-items: center;
+                    color: var(--continuity-teal);
+                    display: flex;
+                    font-size: 0.78rem;
+                    font-weight: 900;
+                    gap: 0.7rem;
+                    letter-spacing: 0.14em;
+                    margin-bottom: 0.85rem;
+                    text-transform: uppercase;
+                }
+
+                .category-title::after {
+                    background: var(--continuity-line);
+                    content: "";
+                    flex: 1;
+                    height: 1px;
                 }
 
                 .examples-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                    gap: 15px;
+                    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+                    gap: 0.8rem;
                 }
 
                 .example-card {
-                    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-                    padding: 20px;
-                    border-radius: 12px;
+                    background: var(--continuity-card);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
                     cursor: pointer;
-                    transition: all 0.3s ease;
-                    border: 2px solid transparent;
+                    min-height: 104px;
+                    padding: 1rem;
+                    position: relative;
+                    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
                 }
 
                 .example-card:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-                    border-color: #667eea;
+                    border-color: rgba(47, 116, 107, 0.45);
+                    box-shadow: var(--continuity-shadow-sm);
+                    transform: translateY(-2px);
                 }
 
                 .example-label {
-                    font-size: 0.85em;
-                    color: #666;
-                    margin-bottom: 8px;
+                    color: var(--continuity-muted);
+                    font-size: 0.78rem;
+                    font-weight: 800;
+                    margin-bottom: 0.55rem;
+                    text-transform: uppercase;
                 }
 
                 .example-function {
-                    min-height: 40px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 1.1em;
+                    min-height: 44px;
+                    overflow-x: auto;
+                    padding: 0.15rem;
                 }
 
                 .input-section {
-                    background: white;
-                    border-radius: 20px;
-                    padding: 30px;
-                    margin-bottom: 30px;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                    margin-bottom: 1.2rem;
+                    padding: clamp(1.1rem, 3vw, 1.8rem);
                 }
 
                 .limit-builder {
-                    margin-bottom: 25px;
+                    margin-bottom: 1.4rem;
                 }
 
                 .limit-display {
                     display: flex;
-                    align-items: center;
-                    gap: 15px;
-                    margin-bottom: 20px;
+                    align-items: flex-start;
+                    gap: 1rem;
+                    margin-bottom: 1.2rem;
                     flex-wrap: wrap;
+                    background: var(--continuity-soft);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    padding: 1rem;
                 }
 
                 .limit-part {
-                    font-size: 1.5em;
-                    font-weight: 600;
-                    color: #333;
+                    color: var(--continuity-blue);
+                    font-size: 1.25rem;
+                    font-weight: 800;
                 }
 
                 .limit-label {
-                    font-family: 'Times New Roman', serif;
+                    font-family: Georgia, "Times New Roman", serif;
                 }
 
                 .variables-container {
                     display: flex;
-                    flex-direction: column;
-                    gap: 10px;
+                    flex-wrap: wrap;
+                    gap: 0.65rem;
                 }
 
                 .variable-row {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    gap: 0.5rem;
+                }
+
+                .variable-name-input,
+                .limit-input-inline {
+                    background: var(--continuity-card);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 6px;
+                    color: var(--continuity-ink);
+                    font-size: 1rem;
+                    padding: 0.62rem 0.7rem;
+                    text-align: center;
+                    transition: border-color 0.18s ease, box-shadow 0.18s ease;
                 }
 
                 .variable-name-input {
-                    width: 60px;
-                    padding: 8px 12px;
-                    border: 2px solid #e0e0e0;
-                    border-radius: 8px;
-                    font-size: 1.1em;
-                    text-align: center;
-                    transition: border 0.3s;
-                }
-
-                .variable-name-input:focus {
-                    outline: none;
-                    border-color: #667eea;
-                }
-
-                .limit-arrow {
-                    font-size: 1.3em;
-                    color: #667eea;
+                    width: 64px;
                 }
 
                 .limit-input-inline {
-                    width: 100px;
-                    padding: 8px 12px;
-                    border: 2px solid #e0e0e0;
-                    border-radius: 8px;
-                    font-size: 1.1em;
-                    text-align: center;
-                    transition: border 0.3s;
+                    width: 108px;
                 }
 
+                .variable-name-input:focus,
                 .limit-input-inline:focus {
+                    border-color: var(--continuity-teal);
+                    box-shadow: 0 0 0 3px rgba(47, 116, 107, 0.13);
                     outline: none;
-                    border-color: #667eea;
                 }
 
-                .add-var-btn, .remove-var-btn {
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
+                .limit-arrow {
+                    color: var(--continuity-gold);
+                    font-size: 1.25rem;
+                    font-weight: 900;
+                }
+
+                .add-var-btn,
+                .remove-var-btn {
+                    align-items: center;
+                    border-radius: 6px;
                     border: none;
-                    font-size: 1.3em;
                     cursor: pointer;
-                    transition: all 0.3s;
+                    display: inline-flex;
+                    font-size: 1.1rem;
+                    font-weight: 900;
+                    height: 38px;
+                    justify-content: center;
+                    transition: background 0.18s ease, transform 0.18s ease;
+                    width: 38px;
                 }
 
                 .add-var-btn {
-                    background: #667eea;
+                    background: var(--continuity-teal);
                     color: white;
                 }
 
                 .add-var-btn:hover {
-                    background: #5568d3;
-                    transform: scale(1.1);
+                    background: #255d56;
+                    transform: translateY(-1px);
                 }
 
                 .remove-var-btn {
-                    background: #ff6b6b;
+                    background: #8e3e3e;
                     color: white;
                 }
 
                 .remove-var-btn:hover {
-                    background: #ee5a52;
-                    transform: scale(1.1);
+                    background: #783333;
+                    transform: translateY(-1px);
                 }
 
                 .analysis-type-selector {
-                    display: flex;
-                    gap: 15px;
-                    margin-bottom: 20px;
-                    padding: 15px;
-                    background: #f8f9fa;
-                    border-radius: 12px;
+                    background: var(--continuity-soft);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    display: grid;
+                    gap: 0.75rem;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    margin-bottom: 1rem;
+                    padding: 0.75rem;
                 }
 
                 .radio-option {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    background: var(--continuity-card);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 6px;
                     cursor: pointer;
+                    gap: 0.6rem;
+                    padding: 0.8rem 0.9rem;
                 }
 
                 .radio-option input[type="radio"] {
-                    width: 18px;
+                    accent-color: var(--continuity-teal);
                     height: 18px;
-                    cursor: pointer;
+                    width: 18px;
                 }
 
                 .radio-option label {
-                    font-size: 1em;
+                    color: var(--continuity-ink);
                     cursor: pointer;
+                    font-size: 0.95rem;
+                    font-weight: 800;
                 }
 
                 .function-label {
-                    font-size: 1.1em;
-                    color: #333;
-                    margin-bottom: 10px;
-                    font-weight: 500;
+                    color: var(--continuity-ink);
+                    font-size: 0.98rem;
+                    font-weight: 800;
+                    margin-bottom: 0.65rem;
                 }
 
                 .function-field {
-                    min-height: 60px;
-                    padding: 15px;
-                    border: 2px solid #e0e0e0;
-                    border-radius: 12px;
-                    font-size: 1.3em;
-                    transition: border 0.3s;
-                    background: white;
+                    background: var(--continuity-card);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    font-size: 1.25rem;
+                    min-height: 68px;
+                    overflow-x: auto;
+                    padding: 1rem;
+                    transition: border-color 0.18s ease, box-shadow 0.18s ease;
                 }
 
                 .function-field:focus-within {
-                    border-color: #667eea;
+                    border-color: var(--continuity-teal);
+                    box-shadow: 0 0 0 3px rgba(47, 116, 107, 0.13);
                 }
 
                 .toolbar-section {
-                    margin-top: 20px;
+                    margin-top: 1rem;
                 }
 
                 .toolbar-title {
-                    font-size: 0.95em;
-                    color: #666;
-                    margin-bottom: 10px;
+                    color: var(--continuity-muted);
+                    font-size: 0.8rem;
+                    font-weight: 900;
+                    letter-spacing: 0.12em;
+                    margin-bottom: 0.7rem;
+                    text-transform: uppercase;
                 }
 
                 .toolbar {
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 8px;
+                    gap: 0.5rem;
                 }
 
                 .toolbar-button {
-                    padding: 8px 12px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
+                    background: var(--continuity-card);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 6px;
+                    color: var(--continuity-blue);
                     cursor: pointer;
-                    font-size: 0.95em;
-                    transition: all 0.3s;
+                    font-size: 0.92rem;
+                    font-weight: 900;
+                    min-width: 48px;
+                    padding: 0.58rem 0.72rem;
+                    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
                 }
 
                 .toolbar-button:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                    background: rgba(47, 116, 107, 0.1);
+                    border-color: rgba(47, 116, 107, 0.36);
+                    color: var(--continuity-teal);
+                    transform: translateY(-1px);
                 }
 
                 .actions {
                     display: flex;
-                    gap: 15px;
-                    margin-top: 25px;
+                    gap: 0.8rem;
+                    margin-top: 1.35rem;
                 }
 
-                .calculate-button, .clear-button {
+                .calculate-button,
+                .clear-button {
+                    border: 1px solid transparent;
+                    border-radius: 8px;
                     flex: 1;
-                    padding: 15px 30px;
-                    border: none;
-                    border-radius: 12px;
-                    font-size: 1.1em;
-                    font-weight: 600;
+                    font-size: 1rem;
+                    font-weight: 900;
+                    min-height: 48px;
+                    padding: 0.9rem 1.2rem;
                     cursor: pointer;
-                    transition: all 0.3s;
+                    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
                 }
 
                 .calculate-button {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: var(--continuity-ink);
+                    box-shadow: var(--continuity-shadow-sm);
                     color: white;
-                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
                 }
 
                 .calculate-button:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+                    background: var(--continuity-teal);
+                    transform: translateY(-1px);
                 }
 
                 .clear-button {
-                    background: #f5f5f5;
-                    color: #333;
+                    background: var(--continuity-card);
+                    border-color: var(--continuity-line);
+                    color: var(--continuity-ink);
                 }
 
                 .clear-button:hover {
-                    background: #e0e0e0;
+                    border-color: var(--continuity-gold);
+                    color: var(--continuity-gold);
                 }
 
                 .result-section {
-                    background: white;
-                    border-radius: 20px;
-                    padding: 30px;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                    padding: clamp(1.1rem, 3vw, 1.8rem);
                     animation: slideUp 0.5s ease;
                 }
 
@@ -755,90 +844,99 @@ const ContinuityFinder = () => {
                 }
 
                 .answer-box {
-                    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-                    padding: 25px;
-                    border-radius: 15px;
-                    margin-bottom: 30px;
-                    box-shadow: 0 4px 15px rgba(132, 250, 176, 0.3);
+                    background: linear-gradient(135deg, rgba(47, 116, 107, 0.16), rgba(194, 138, 46, 0.14));
+                    border: 1px solid rgba(47, 116, 107, 0.22);
+                    border-radius: 8px;
+                    margin-bottom: 1rem;
+                    padding: 1.2rem;
                 }
 
                 .answer-label {
-                    font-size: 1.1em;
-                    color: #333;
-                    margin-bottom: 10px;
-                    font-weight: 600;
+                    color: var(--continuity-muted);
+                    font-size: 0.78rem;
+                    font-weight: 900;
+                    letter-spacing: 0.12em;
+                    margin-bottom: 0.55rem;
+                    text-transform: uppercase;
                 }
 
                 .answer-value {
-                    font-size: 2em;
+                    color: var(--continuity-ink);
+                    font-family: Georgia, "Times New Roman", serif;
+                    font-size: clamp(1.45rem, 4vw, 2.2rem);
                     font-weight: 700;
-                    color: #2d3748;
+                    line-height: 1.15;
                 }
 
                 .steps-box {
-                    background: #f8f9fa;
-                    border-radius: 15px;
-                    padding: 25px;
+                    background: var(--continuity-soft);
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    padding: 1rem;
                 }
 
                 .steps-title {
-                    font-size: 1.5em;
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 20px;
+                    color: #15100c;
+                    font-family: Georgia, "Times New Roman", serif;
+                    font-size: clamp(1.25rem, 3vw, 1.65rem);
+                    font-weight: 700;
+                    margin-bottom: 1rem;
                 }
 
                 .steps-content {
                     display: flex;
                     flex-direction: column;
-                    gap: 20px;
+                    gap: 0.8rem;
                 }
 
                 .step-item {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 12px;
-                    border-left: 4px solid #667eea;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    background: var(--continuity-card);
+                    border: 1px solid var(--continuity-line);
+                    border-left: 4px solid var(--continuity-teal);
+                    border-radius: 8px;
+                    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+                    padding: 1rem;
                 }
 
                 .step-number {
-                    font-size: 1.1em;
-                    font-weight: 600;
-                    color: #667eea;
-                    margin-bottom: 10px;
+                    color: var(--continuity-teal);
+                    font-size: 0.98rem;
+                    font-weight: 900;
+                    margin-bottom: 0.55rem;
                 }
 
                 .step-content {
-                    font-size: 1em;
-                    color: #555;
+                    color: var(--continuity-muted);
+                    font-size: 0.98rem;
                     line-height: 1.6;
-                    margin-bottom: 10px;
+                    margin-bottom: 0.6rem;
                 }
 
                 .step-math {
-                    padding: 15px;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                    min-height: 40px;
-                    display: flex;
                     align-items: center;
+                    background: #f7f2ea;
+                    border: 1px solid var(--continuity-line);
+                    border-radius: 8px;
+                    display: flex;
                     justify-content: center;
-                    margin-top: 10px;
+                    margin-top: 0.7rem;
+                    min-height: 44px;
+                    overflow-x: auto;
+                    padding: 0.9rem;
                 }
 
                 .toast {
                     position: fixed;
-                    bottom: 30px;
-                    right: 30px;
-                    background: #333;
+                    bottom: 1.4rem;
+                    right: 1.4rem;
+                    background: var(--continuity-ink);
                     color: white;
-                    padding: 15px 25px;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                    padding: 0.9rem 1rem;
+                    border-radius: 8px;
+                    box-shadow: var(--continuity-shadow);
                     opacity: 0;
                     transform: translateY(20px);
-                    transition: all 0.3s;
+                    transition: opacity 0.25s ease, transform 0.25s ease;
                     z-index: 1000;
                 }
 
@@ -849,15 +947,59 @@ const ContinuityFinder = () => {
 
                 @media (max-width: 768px) {
                     .app-title {
-                        font-size: 2em;
+                        text-align: left;
+                    }
+
+                    .app-subtitle {
+                        text-align: left;
+                    }
+
+                    .app-subtitle::before {
+                        margin-left: 0;
+                    }
+
+                    .analysis-type-selector {
+                        grid-template-columns: 1fr;
                     }
 
                     .examples-grid {
                         grid-template-columns: 1fr;
                     }
 
-                    .actions {
+                    .actions,
+                    .limit-display {
                         flex-direction: column;
+                    }
+
+                    .variables-container,
+                    .variable-row,
+                    .calculate-button,
+                    .clear-button {
+                        width: 100%;
+                    }
+
+                    .variable-name-input {
+                        flex: 0 0 64px;
+                    }
+
+                    .limit-input-inline {
+                        flex: 1;
+                        width: auto;
+                    }
+
+                    .toast {
+                        inset: auto 1rem 1rem;
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .example-card,
+                    .toolbar-button,
+                    .calculate-button,
+                    .clear-button,
+                    .result-section {
+                        animation: none;
+                        transition: none;
                     }
                 }
             `}</style>
@@ -1023,7 +1165,7 @@ const ContinuityFinder = () => {
                                 {steps.map((step, index) => (
                                     <div key={index} className="step-item">
                                         <div className="step-number">{step.title}</div>
-                                        <div className="step-content">{step.explanation}</div>
+                                        <div className="step-content">{renderExplanation(step.explanation)}</div>
                                         {step.math && (
                                             <div className="step-math" id={`step-math-${index}`}></div>
                                         )}

@@ -1,0 +1,92 @@
+import { createContext, useContext, useState, useCallback } from "react";
+
+const AuthContext = createContext(null);
+
+const STORAGE_KEY = "calcvoyager_user";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8002";
+
+function loadUser() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    return user?.accessToken ? user : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveUser(user) {
+  try {
+    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
+async function requestAuth(path, body) {
+  let response;
+  try {
+    response = await fetch(`${API_URL}/api/auth/${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    return {
+      error: `Could not reach the backend at ${API_URL}. Make sure it is running on port 8002.`,
+    };
+  }
+
+  let data = {};
+  try {
+    data = await response.json();
+  } catch {}
+
+  if (!response.ok) {
+    return { error: data.detail || "Authentication failed." };
+  }
+
+  const session = {
+    ...data.user,
+    accessToken: data.access_token,
+    tokenType: data.token_type,
+  };
+  return { ok: true, user: session };
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(loadUser);
+
+  const signup = useCallback(async (username, password) => {
+    const result = await requestAuth("signup", { username, password });
+    if (result.ok) {
+      setUser(result.user);
+      saveUser(result.user);
+    }
+    return result;
+  }, []);
+
+  const login = useCallback(async (username, password) => {
+    const result = await requestAuth("login", { username, password });
+    if (result.ok) {
+      setUser(result.user);
+      saveUser(result.user);
+    }
+    return result;
+  }, []);
+
+  const logout = useCallback(() => {
+    setUser(null);
+    saveUser(null);
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, signup, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
