@@ -73,6 +73,16 @@
   .db-stats-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .db-review-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .db-review-button {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 .db-stat {
@@ -223,6 +233,122 @@
   font-size: 0.9rem;
   color: var(--teal);
   flex-shrink: 0;
+}
+
+/* Review reminders */
+.db-review-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.db-review-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.db-review-content {
+  min-width: 0;
+}
+
+.db-review-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.db-review-label {
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.db-review-meta {
+  margin: 0.45rem 0 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.db-review-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.45rem 0 0.2rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.db-review-meta-row span {
+  background: rgba(47, 116, 107, 0.08);
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+}
+
+.db-review-copy {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.db-review-button {
+  flex-shrink: 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  background: rgba(214, 169, 34, 0.12);
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.db-review-button:hover {
+  transform: translateY(-1px);
+  background: rgba(214, 169, 34, 0.2);
+  border-color: var(--teal);
+}
+
+.db-review-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 1.4rem;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(214, 169, 34, 0.08), rgba(47, 116, 107, 0.06));
+  text-align: center;
+}
+
+.db-review-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 1.2rem;
+}
+
+.db-review-empty h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.db-review-empty p {
+  margin: 0;
+  max-width: 420px;
+  color: var(--muted);
 }
 
 /* Tools */

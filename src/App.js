@@ -6,7 +6,6 @@ import ScrollToTop from "./utils/ScrollToTop";
 import IntegralsPart1 from "./pages/IntegralsPart1";
 import IntegralsPart2 from "./pages/IntegralsPart2";
 
-// Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -15,7 +14,6 @@ import AISolver from "./pages/AISolver";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-// Guide parts
 import PartialPart1 from "./pages/PartialPart1";
 import PartialPart2 from "./pages/PartialPart2";
 import VectorPart1 from "./pages/VectorPart1";
@@ -23,7 +21,6 @@ import VectorPart2 from "./pages/VectorPart2";
 import LimitsPart1 from "./pages/LimitsPart1";
 import LimitsPart2 from "./pages/LimitsPart2";
 
-// Tools
 import ContinuityFinder from "./pages/ContinuityFinder";
 import ExtremeValueFunction from "./pages/ExtremeValueFinder";
 import VolumeCalculator from "./pages/VolumeCalculator";
