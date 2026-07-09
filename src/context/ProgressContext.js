@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from "rea
 import { useAuth } from "./AuthContext";
 
 const ProgressContext = createContext(null);
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8002";
 
 function storageKey(username) {
   return `calcvoyager_progress_${username}`;
@@ -20,6 +21,8 @@ function loadProgress(username) {
 function defaultProgress() {
   return {
     completedSections: {},   // { "partial-1": true, "vector-1": true }
+    completedSectionTimestamps: {},
+    completedSectionMetadata: {},
     quizScores: {},          // { "partial-1-mcq141": { score: 2, total: 3 } }
     bookmarks: [],           // [{ id, title, path, addedAt }]
     solverHistory: [],       // [{ input, result, timestamp }]
@@ -27,13 +30,28 @@ function defaultProgress() {
   };
 }
 
+function normalizeProgressPayload(payload) {
+  return {
+    completedSections: payload?.completedSections || {},
+    completedSectionTimestamps: payload?.completedSectionTimestamps || {},
+    completedSectionMetadata: payload?.completedSectionMetadata || {},
+    quizScores: payload?.quizScores || {},
+    bookmarks: payload?.bookmarks || [],
+    solverHistory: payload?.solverHistory || [],
+    lastVisited: payload?.lastVisited || {},
+    solverUses: payload?.solverUses ?? 0,
+  };
+}
+
 export function ProgressProvider({ children }) {
   const { user } = useAuth();
   const [progress, setProgress] = useState(() => loadProgress(user?.username));
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Reload when user changes
   useEffect(() => {
     setProgress(loadProgress(user?.username));
+    setIsHydrated(false);
   }, [user?.username]);
 
   const persist = useCallback(
@@ -46,18 +64,108 @@ export function ProgressProvider({ children }) {
     [user?.username]
   );
 
+  useEffect(() => {
+    if (!user?.accessToken) {
+      setIsHydrated(true);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchProgress() {
+      try {
+        const response = await fetch(`${API_URL}/api/progress/`, {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to load progress");
+        }
+
+        const payload = await response.json();
+        if (!cancelled) {
+          setProgress((prev) => ({
+            ...prev,
+            ...normalizeProgressPayload(payload),
+          }));
+          persist({
+            ...defaultProgress(),
+            ...normalizeProgressPayload(payload),
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setProgress((prev) => ({ ...prev, completedSectionTimestamps: prev.completedSectionTimestamps || {} }));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsHydrated(true);
+        }
+      }
+    }
+
+    fetchProgress();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.accessToken, persist]);
+
   const markSectionComplete = useCallback(
-    (sectionId) => {
+    async (sectionId) => {
+      if (!user?.accessToken) {
+        setProgress((prev) => {
+          const next = {
+            ...prev,
+            completedSections: { ...prev.completedSections, [sectionId]: true },
+            completedSectionTimestamps: {
+              ...prev.completedSectionTimestamps,
+              [sectionId]: Date.now(),
+            },
+          };
+          persist(next);
+          return next;
+        });
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/progress/section/complete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+        body: JSON.stringify({ section_id: sectionId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not mark section complete");
+      }
+
+      const payload = await response.json();
+      const completedAt = payload.completed_at ?? Date.now();
       setProgress((prev) => {
         const next = {
           ...prev,
           completedSections: { ...prev.completedSections, [sectionId]: true },
+          completedSectionTimestamps: {
+            ...prev.completedSectionTimestamps,
+            [sectionId]: completedAt,
+          },
+          completedSectionMetadata: {
+            ...prev.completedSectionMetadata,
+            [sectionId]: {
+              needs_review: false,
+              days_since_completion: 0,
+            },
+          },
         };
         persist(next);
         return next;
       });
     },
-    [persist]
+    [persist, user?.accessToken]
   );
 
   const saveQuizScore = useCallback(
@@ -145,7 +253,7 @@ export function ProgressProvider({ children }) {
     completedCount: Object.keys(progress.completedSections).length,
     bookmarkCount: progress.bookmarks.length,
     quizzesTaken: Object.keys(progress.quizScores).length,
-    solverUses: progress.solverHistory.length,
+    solverUses: progress.solverHistory.length || progress.solverUses || 0,
   };
 
   return (
@@ -160,6 +268,7 @@ export function ProgressProvider({ children }) {
         isBookmarked,
         addSolverHistory,
         recordVisit,
+        isHydrated,
       }}
     >
       {children}

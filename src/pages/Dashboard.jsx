@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
+import { formatCompletionDate } from "../utils/progressUtils";
 import "./Dashboard.css";
 
 const CURRICULUM = [
@@ -95,7 +96,6 @@ function ProgressChart({ curriculum, progress }) {
   const notStarted = totalParts - completedParts;
 
   const completedPct = totalParts > 0 ? (completedParts / totalParts) * 100 : 0;
-  const notStartedPct = 100 - completedPct;
 
   return (
     <div className="db-chart-wrapper">
@@ -189,6 +189,27 @@ function Dashboard() {
   const { user, logout } = useAuth();
   const { progress, stats, removeBookmark, recordVisit } = useProgress();
   const navigate = useNavigate();
+
+  const overdueReviewTopics = useMemo(() => {
+    return CURRICULUM.flatMap((course) =>
+      course.parts
+        .map((part) => ({
+          ...part,
+          courseTitle: course.title,
+          courseColor: course.color,
+          completedAt: progress.completedSectionTimestamps?.[part.id],
+          metadata: progress.completedSectionMetadata?.[part.id] || {
+            needs_review: false,
+            days_since_completion: 0,
+          },
+        }))
+        .filter((part) => part.metadata.needs_review)
+    ).sort((a, b) => {
+      const aTime = Number(a.completedAt) || 0;
+      const bTime = Number(b.completedAt) || 0;
+      return aTime - bTime;
+    });
+  }, [progress.completedSectionMetadata, progress.completedSectionTimestamps]);
 
   // Calculate study streak
   const [streak, setStreak] = useState(0);
@@ -287,6 +308,39 @@ function Dashboard() {
           </div>
           <ProgressBar value={stats.completedCount} max={stats.totalSections} />
         </div>
+      </section>
+
+      {/* Review reminders */}
+      <section className="db-section">
+        <h2 className="db-section-title">Review Reminders</h2>
+        {overdueReviewTopics.length === 0 ? (
+          <div className="db-review-empty" role="status">
+            <div className="db-review-empty-icon">✨</div>
+            <h3>Everything looks fresh</h3>
+            <p>All of your completed topics have been reviewed recently. Keep up the momentum.</p>
+          </div>
+        ) : (
+          <div className="db-review-list">
+            {overdueReviewTopics.map((part) => (
+              <article key={part.id} className="db-review-card">
+                <div className="db-review-content">
+                  <div className="db-review-title">{part.courseTitle}</div>
+                  <div className="db-review-label">{part.label}</div>
+                  <div className="db-review-meta-row">
+                    <span>{formatCompletionDate(part.completedAt)}</span>
+                    <span>{part.metadata.days_since_completion} days since completion</span>
+                  </div>
+                  <p className="db-review-copy">
+                    Consider reviewing this topic before progressing further.
+                  </p>
+                </div>
+                <Link to={part.path} className="db-review-button">
+                  Review Topic
+                </Link>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Curriculum */}

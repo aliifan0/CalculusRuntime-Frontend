@@ -7,7 +7,6 @@ import IntegralsPart1 from "./pages/IntegralsPart1";
 import IntegralsPart2 from "./pages/IntegralsPart2";
 import PractiseSection from './pages/PractiseSection';
 
-// Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -16,7 +15,6 @@ import AISolver from "./pages/AISolver";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-// Guide parts
 import PartialPart1 from "./pages/PartialPart1";
 import PartialPart2 from "./pages/PartialPart2";
 import VectorPart1 from "./pages/VectorPart1";
@@ -32,7 +30,6 @@ import StokesPart2 from "./pages/StokesPart2";
 import DivergencePart1 from "./pages/DivergencePart1";
 import DivergencePart2 from "./pages/DivergencePart2";
 
-// Tools
 import ContinuityFinder from "./pages/ContinuityFinder";
 import ExtremeValueFunction from "./pages/ExtremeValueFinder";
 import VolumeCalculator from "./pages/VolumeCalculator";
