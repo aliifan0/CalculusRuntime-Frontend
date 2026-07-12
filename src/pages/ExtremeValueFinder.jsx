@@ -3,9 +3,12 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
 } from "react";
 import * as math from "mathjs";
 import { BlockMath as KatexBlockMath } from "../components/Math";
+import HintButton from "../components/HintButton";
+import { useStepHints } from "../hooks/useStepHints";
 
 const BlockMath = ({ latex }) => (
   <KatexBlockMath
@@ -13,6 +16,50 @@ const BlockMath = ({ latex }) => (
     style={{ overflowX: "auto", padding: "0.5rem 0" }}
   />
 );
+
+function buildExtremeHintSteps(raw, results) {
+  if (!results) return [];
+  const hints = [
+    {
+      title: "Step 1: Goal",
+      body: `Find critical points of f(x, y) = ${raw || "f"} by solving ∇f = 0.`,
+    },
+    {
+      title: "Step 2: Set up the system",
+      body: "Compute the partial derivatives fx and fy, then solve fx = 0 and fy = 0 simultaneously.",
+    },
+  ];
+
+  if (results.note) {
+    hints.push({
+      title: "Step 3: Search result",
+      body: results.note,
+    });
+    return hints;
+  }
+
+  const points = results.points || [];
+  hints.push({
+    title: "Step 3: Critical points",
+    body:
+      points.length === 0
+        ? "No critical points were found in the search window."
+        : `Found ${points.length} critical point(s): ${points
+            .map((p) => `(${p.x}, ${p.y})`)
+            .join(", ")}.`,
+  });
+  hints.push({
+    title: "Step 4: Second derivative test",
+    body: "Classify each point with the discriminant D = fxx·fyy − (fxy)².",
+  });
+  points.forEach((pt, i) => {
+    hints.push({
+      title: `Step ${5 + i}: (${pt.x}, ${pt.y})`,
+      body: `D ≈ ${Number(pt.D).toFixed(6)} → ${pt.classification}. ${pt.detail || ""}`,
+    });
+  });
+  return hints;
+}
 
 // ─── Demo examples ─────────────────────────────────────────────────────────
 const EXAMPLES = [
@@ -139,6 +186,23 @@ export default function ExtremeValueFinder() {
   const mathFieldRef = useRef(null);
   const fieldRef = useRef(null);
 
+  const hintSteps = useMemo(
+    () => buildExtremeHintSteps(inputVal, results),
+    [inputVal, results]
+  );
+  const hintResetKey = results
+    ? `${inputVal}|${results.points?.length ?? 0}|${results.note ?? ""}`
+    : "";
+  const {
+    visibleCount,
+    total: hintTotal,
+    visibleSteps,
+    allRevealed,
+    feedback: hintFeedback,
+    revealHint,
+    resetHints,
+  } = useStepHints(hintSteps, hintResetKey);
+
   // MathQuill init
   useEffect(() => {
     if (window.MathQuill && fieldRef.current && !mathFieldRef.current) {
@@ -203,6 +267,7 @@ export default function ExtremeValueFinder() {
     setInputVal("");
     setResults(null);
     setError("");
+    resetHints();
     if (mathFieldRef.current) mathFieldRef.current.latex("");
   };
 
@@ -675,11 +740,38 @@ export default function ExtremeValueFinder() {
             </button>
           </div>
 
+          <HintButton
+            onReveal={revealHint}
+            visibleCount={visibleCount}
+            total={hintTotal}
+            feedback={hintFeedback}
+            disabled={!results}
+          />
+
+          {results && (
+            <div className="hint-steps" style={{ marginTop: "0.75rem" }}>
+              {visibleSteps.length === 0 && (
+                <div className="hint-step">
+                  <div className="hint-step__body">
+                    Analysis is ready. Press <strong>Show Me a Hint</strong> to
+                    walk through the solution one step at a time.
+                  </div>
+                </div>
+              )}
+              {visibleSteps.map((step, i) => (
+                <div key={i} className="hint-step">
+                  <div className="hint-step__title">{step.title}</div>
+                  <div className="hint-step__body">{step.body}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {error && <div className="ev-error">⚠️ {error}</div>}
         </div>
 
-        {/* Results */}
-        {results && (
+        {/* Full result cards only after all hints are revealed */}
+        {results && allRevealed && (
           <div className="ev-section ev-results">
             <div className="ev-section-title">
               📊 Results{" "}

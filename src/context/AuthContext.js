@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
@@ -56,6 +56,31 @@ async function requestAuth(path, body) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(loadUser);
+
+  // Drop stale tokens whose user no longer exists in the backend DB.
+  useEffect(() => {
+    if (!user?.accessToken) return undefined;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${user.accessToken}` },
+        });
+        if (cancelled) return;
+        if (response.status === 401 || response.status === 404) {
+          setUser(null);
+          saveUser(null);
+        }
+      } catch {
+        // Backend unreachable — keep local session for offline UX.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.accessToken]);
 
   const signup = useCallback(async (username, password) => {
     const result = await requestAuth("signup", { username, password });

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import StudyGuideShell from "./StudyGuideShell";
 import "./PartialDerivativesGuide.css";
 
@@ -22,78 +23,43 @@ function OpeningNote() {
 
 function GuideSidebarPart1() {
   return (
-    <aside className="guide-sidebar">
-      <div className="sidebar-brand">
-        <span className="brand-icon">λ</span>
-        <div className="brand-text">
-          <h4>Lagrange Space</h4>
-          <p>Foundations — Part 1</p>
-        </div>
+    <nav className="sidebar">
+      <div className="sb-brand">
+        <div className="sb-sub">Multivariable Calculus</div>
+        <div className="sb-title">Lagrange Multipliers · Part 1</div>
       </div>
-      <div className="sidebar-menu-wrapper">
-        <div className="sidebar-section-label">Core Lecture Content</div>
-        <ul className="sidebar-links">
-          <li><a href="#s151" className="sidebar-link"><span className="link-num">15.1</span><span className="link-text">Geometric Intuition</span></a></li>
-          <li><a href="#quiz-151" className="sidebar-link quiz-link"><span className="link-num">Q1-3</span><span className="link-text">Quiz Section 15.1</span></a></li>
-          <li><a href="#s152" className="sidebar-link"><span className="link-num">15.2</span><span className="link-text">Gradient Alignment Mechanics</span></a></li>
-          <li><a href="#quiz-152" className="sidebar-link quiz-link"><span className="link-num">Q4-6</span><span className="link-text">Quiz Section 15.2</span></a></li>
-          <li><a href="#s153" className="sidebar-link"><span className="link-num">15.3</span><span className="link-text">Objective vs Constraint Functions</span></a></li>
-          <li><a href="#quiz-153" className="sidebar-link quiz-link"><span className="link-num">Q7-9</span><span className="link-text">Quiz Section 15.3</span></a></li>
-        </ul>
-      </div>
-    </aside>
+      <div className="sb-group">Sections</div>
+      <a className="sb-link" href="#s151">Geometric Intuition</a>
+      <a className="sb-link" href="#quiz-151">Quiz 15.1</a>
+      <a className="sb-link" href="#s152">Gradient Alignment</a>
+      <a className="sb-link" href="#quiz-152">Quiz 15.2</a>
+      <a className="sb-link" href="#s153">Objective vs Constraint</a>
+      <a className="sb-link" href="#quiz-153">Quiz 15.3</a>
+    </nav>
   );
 }
 
 function GuideHeaderPart1() {
   return (
-    <header className="guide-header">
-      <div className="header-meta">
-        <span className="chapter-tag">Chapter 15 — Constrained Optimization</span>
-        <span className="status-badge green">Module 01 Active</span>
-      </div>
-      <h1 className="main-title">Lagrange Multipliers: Foundations</h1>
-      <p className="header-subtitle">Geometric Tangency, Vector Space Alignments, and Boundary Physics</p>
+    <header className="ch-hdr">
+      <div className="ch-eye">Multivariable Calculus Study Guide · Part 1 of 2</div>
+      <h1 className="ch-title">Lagrange Multipliers</h1>
+      <p className="ch-sub">Geometric Tangency, Vector Alignments &amp; Boundary Physics</p>
+      <span className="ch-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
     </header>
   );
 }
 
 function TableOfContentsPart1() {
   return (
-    <nav className="toc-box">
-      <div className="toc-head">
-        <h3 className="toc-title">Sections Covered in Part 1</h3>
-        <span className="toc-estimate">Reading Time: 50 Mins</span>
+    <nav className="toc">
+      <div className="toc-h">Contents — Part 1 of 2</div>
+      <div className="toc-grid">
+        <a className="toc-a" href="#s151">Geometric Intuition</a>
+        <a className="toc-a" href="#s152">Gradient Alignment</a>
+        <a className="toc-a" href="#s153">Objective vs Constraint</a>
+        <a className="toc-a" href="#quiz-151">Practice Quizzes</a>
       </div>
-      <ol className="toc-list">
-        <li>
-          <a href="#s151" className="toc-item-link">
-            <span className="toc-num-prefix">15.1</span>
-            <div className="toc-link-content">
-              <strong>The Geometric Core Intuition</strong>
-              <p>Visualizing level curves expanding until they kiss the static constraint boundary line.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s152" className="toc-item-link">
-            <span className="toc-num-prefix">15.2</span>
-            <div className="toc-link-content">
-              <strong>Mathematical Derivation of Gradient Alignment</strong>
-              <p>Proving why parallel normal vectors reveal the exact mathematical optimization coordinate criteria.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s153" className="toc-item-link">
-            <span className="toc-num-prefix">15.3</span>
-            <div className="toc-link-content">
-              <strong>Deconstructing Objective vs Constraint Fields</strong>
-              <p>Isolating the function you want to maximize from the strict rules enclosing your parameter inputs.</p>
-            </div>
-          </a>
-        </li>
-      </ol>
     </nav>
   );
 }
@@ -343,89 +309,45 @@ function QuizMcq153() {
 
 function GuideSidebarPart2() {
   return (
-    <aside className="guide-sidebar">
-      <div className="sidebar-brand">
-        <span className="brand-icon">∇</span>
-        <div className="brand-text">
-          <h4>Lagrange Space</h4>
-          <p>Applications — Part 2</p>
-        </div>
+    <nav className="sidebar">
+      <div className="sb-brand">
+        <div className="sb-sub">Multivariable Calculus</div>
+        <div className="sb-title">Lagrange Multipliers · Part 2</div>
       </div>
-      <div className="sidebar-menu-wrapper">
-        <div className="sidebar-section-label">Application Modules</div>
-        <ul className="sidebar-links">
-          <li><a href="#s154" className="sidebar-link"><span className="link-num">15.4</span><span className="link-text">Single Constraint Workflows</span></a></li>
-          <li><a href="#quiz-154" className="sidebar-link quiz-link"><span className="link-num">Q10-12</span><span className="link-text">Quiz Section 15.4</span></a></li>
-          <li><a href="#s155" className="sidebar-link"><span className="link-num">15.5</span><span className="link-text">Multi-Constraint Systems</span></a></li>
-          <li><a href="#quiz-155" className="sidebar-link quiz-link"><span className="link-num">Q13-15</span><span className="link-text">Quiz Section 15.5</span></a></li>
-          <li><a href="#s156" className="sidebar-link"><span className="link-num">15.6</span><span className="link-text">Extreme Value Verifications</span></a></li>
-          <li><a href="#quiz-156" className="sidebar-link quiz-link"><span className="link-num">Q16-18</span><span className="link-text">Quiz Section 15.6</span></a></li>
-          <li><a href="#s157" className="sidebar-link"><span className="link-num">15.7</span><span className="link-text">Industrial Physics Dynamics</span></a></li>
-          <li><a href="#quiz-157" className="sidebar-link quiz-link"><span className="link-num">Q19-21</span><span className="link-text">Quiz Section 15.7</span></a></li>
-        </ul>
-      </div>
-    </aside>
+      <div className="sb-group">Sections</div>
+      <a className="sb-link" href="#s154">Single Constraint Workflows</a>
+      <a className="sb-link" href="#quiz-154">Quiz 15.4</a>
+      <a className="sb-link" href="#s155">Multi-Constraint Systems</a>
+      <a className="sb-link" href="#quiz-155">Quiz 15.5</a>
+      <a className="sb-link" href="#s156">Extreme Value Verifications</a>
+      <a className="sb-link" href="#quiz-156">Quiz 15.6</a>
+      <a className="sb-link" href="#s157">Industrial Physics Dynamics</a>
+      <a className="sb-link" href="#quiz-157">Quiz 15.7</a>
+    </nav>
   );
 }
 
 function GuideHeaderPart2() {
   return (
-    <header className="guide-header">
-      <div className="header-meta">
-        <span className="chapter-tag">Chapter 15 — Constrained Optimization</span>
-        <span className="status-badge gold">Module 02 Active</span>
-      </div>
-      <h1 className="main-title">Advanced Applications & Multi-Constraints</h1>
-      <p className="header-subtitle">Solving Complex High-Dimensional Systems, Dual Boundaries, and Engineering Workflows</p>
+    <header className="ch-hdr">
+      <div className="ch-eye">Multivariable Calculus Study Guide · Part 2 of 2</div>
+      <h1 className="ch-title">Lagrange Multipliers</h1>
+      <p className="ch-sub">Applications, Dual Constraints &amp; Engineering Workflows</p>
+      <span className="ch-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
     </header>
   );
 }
 
 function TableOfContentsPart2() {
   return (
-    <nav className="toc-box">
-      <div className="toc-head">
-        <h3 className="toc-title">Sections Covered in Part 2</h3>
-        <span className="toc-estimate">Reading Time: 55 Mins</span>
+    <nav className="toc">
+      <div className="toc-h">Contents — Part 2 of 2</div>
+      <div className="toc-grid">
+        <a className="toc-a" href="#s154">Single Constraint Workflows</a>
+        <a className="toc-a" href="#s155">Multi-Constraint Systems</a>
+        <a className="toc-a" href="#s156">Extreme Value Verifications</a>
+        <a className="toc-a" href="#s157">Industrial Physics Dynamics</a>
       </div>
-      <ol className="toc-list">
-        <li>
-          <a href="#s154" className="toc-item-link">
-            <span className="toc-num-prefix">15.4</span>
-            <div className="toc-link-content">
-              <strong>Single Constraint Computational Workflows</strong>
-              <p>Walking step-by-step through substitution tricks to solve algebraic systems without getting stuck on lambda.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s155" className="toc-item-link">
-            <span className="toc-num-prefix">15.5</span>
-            <div className="toc-link-content">
-              <strong>Multi-Constraint Optimization Spaces</strong>
-              <p>Expanding the method to handle multiple intersecting boundary rules using multiple multipliers simultaneously ($\lambda, \mu$).</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s156" className="toc-item-link">
-            <span className="toc-num-prefix">15.6</span>
-            <div className="toc-link-content">
-              <strong>Extreme Value Verification Tests</strong>
-              <p>Learning how to classify your critical points as maximums or minimums when the standard Second Derivative Test doesn't apply.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s157" className="toc-item-link">
-            <span className="toc-num-prefix">15.7</span>
-            <div className="toc-link-content">
-              <strong>Industrial Physics & Economic Dynamics</strong>
-              <p>Applying the method to real-world scenarios like maximizing utility constraints or optimizing production using Cobb-Douglas models.</p>
-            </div>
-          </a>
-        </li>
-      </ol>
     </nav>
   );
 }
@@ -768,64 +690,66 @@ function SectionSummary() {
 function LagrangeMultipliersGuide({ section }) {
   if (section === 2) {
     return (
-      <StudyGuideShell title="Lagrange Multipliers: Applications (Part 2)">
-        <div className="guide-layout-container">
-          <GuideSidebarPart2 />
-          <div className="guide-content-stream">
-            <GuideHeaderPart2 />
-            <TableOfContentsPart2 />
-            <Divider />
-            <SectionS154 />
-            <QuizMcq154 />
-            <Divider />
-            <SectionS155 />
-            <QuizMcq155 />
-            <Divider />
-            <SectionS156 />
-            <QuizMcq156 />
-            <Divider />
-            <SectionS157 />
-            <QuizMcq157 />
-            <Divider />
-            <SectionSummary />
-          </div>
-        </div>
+      <StudyGuideShell
+        guideClass="partial-derivatives-guide"
+        title="Lagrange Multipliers: Applications (Part 2)"
+      >
+        <GuideSidebarPart2 />
+        <main className="main">
+          <GuideHeaderPart2 />
+          <TableOfContentsPart2 />
+          <Divider />
+          <SectionS154 />
+          <QuizMcq154 />
+          <Divider />
+          <SectionS155 />
+          <QuizMcq155 />
+          <Divider />
+          <SectionS156 />
+          <QuizMcq156 />
+          <Divider />
+          <SectionS157 />
+          <QuizMcq157 />
+          <Divider />
+          <SectionSummary />
+        </main>
       </StudyGuideShell>
     );
   }
 
   return (
-    <StudyGuideShell title="Lagrange Multipliers: Foundations (Part 1)">
-      <div className="guide-layout-container">
-        <GuideSidebarPart1 />
-        <div className="guide-content-stream">
-          <GuideHeaderPart1 />
-          <TableOfContentsPart1 />
-          <Divider />
-          <OpeningNote />
-          <Divider />
-          <SectionS151 />
-          <QuizMcq151 />
-          <Divider />
-          <SectionS152 />
-          <QuizMcq152 />
-          <Divider />
-          <SectionS153 />
-          <QuizMcq153 />
-          <Divider />
-          <section id="summary1" className="section terminal-link-box">
-            <div className="sec-badge">{"Reference"}</div>
-            <h2 className="sec-title">{"Part 1 Foundations Complete"}</h2>
-            <p>
-              {"Ready to solve high-dimensional calculations? Move on to "}
-              <a href="/lagrange-multipliers/2" style={{ color: "var(--gold)", fontWeight: 600 }}>
-                {"Part 2: Applications & Multi-Constraint Frameworks"}
-              </a>
-              {" to study complex algebraic substitution workflows, dual boundary systems, and sensitivity rate tracking."}
-            </p>
-          </section>
-        </div>
-      </div>
+    <StudyGuideShell
+      guideClass="partial-derivatives-guide"
+      title="Lagrange Multipliers: Foundations (Part 1)"
+    >
+      <GuideSidebarPart1 />
+      <main className="main">
+        <GuideHeaderPart1 />
+        <TableOfContentsPart1 />
+        <Divider />
+        <OpeningNote />
+        <Divider />
+        <SectionS151 />
+        <QuizMcq151 />
+        <Divider />
+        <SectionS152 />
+        <QuizMcq152 />
+        <Divider />
+        <SectionS153 />
+        <QuizMcq153 />
+        <Divider />
+        <section id="summary1" className="section">
+          <div className="sec-badge">{"Reference"}</div>
+          <h2 className="sec-title">{"Part 1 Foundations Complete"}</h2>
+          <p>
+            {"Ready to solve high-dimensional calculations? Move on to "}
+            <Link to="/lagrange-multipliers/2" style={{ color: "var(--gold)", fontWeight: 600 }}>
+              {"Part 2: Applications & Multi-Constraint Frameworks"}
+            </Link>
+            {" to study complex algebraic substitution workflows, dual boundary systems, and sensitivity rate tracking."}
+          </p>
+        </section>
+      </main>
     </StudyGuideShell>
   );
 }

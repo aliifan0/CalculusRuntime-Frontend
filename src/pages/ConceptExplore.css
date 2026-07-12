@@ -1,11 +1,17 @@
+/* Concept Explore — Partials cream / ink / gold theme */
+
 .concept-explore-page {
-  background:
-    linear-gradient(180deg, rgba(47, 116, 107, 0.08), transparent 340px),
-    linear-gradient(90deg, rgba(49, 78, 115, 0.06) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(49, 78, 115, 0.05) 1px, transparent 1px),
-    var(--paper);
-  background-size: auto, 42px 42px, 42px 42px, auto;
-  color: var(--ink);
+  --ce-ink: #16120a;
+  --ce-cream: #f4ede0;
+  --ce-parchment: #fdf8f0;
+  --ce-gold: #a0720a;
+  --ce-gold-lt: #c89318;
+  --ce-rule: #d4c4a8;
+  --ce-muted: #7a7268;
+  --ce-card: #ffffff;
+  background: var(--ce-cream);
+  color: var(--ce-ink);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
   min-height: 100vh;
   padding-bottom: clamp(3rem, 7vw, 5rem);
 }
@@ -20,272 +26,257 @@
 }
 
 .concept-explore-hero {
-  padding-bottom: clamp(2rem, 5vw, 3.5rem);
-  padding-top: clamp(3.5rem, 8vw, 5.5rem);
+  background: var(--ce-ink);
+  color: var(--ce-cream);
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  max-width: none;
+  padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 5vw, 3rem);
+  position: relative;
+  overflow: hidden;
+}
+
+.concept-explore-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 40px,
+    rgba(200, 146, 42, 0.06) 40px,
+    rgba(200, 146, 42, 0.06) 41px
+  );
+  pointer-events: none;
+}
+
+.concept-explore-hero > * {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .concept-back-link {
   align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
+  border: 1px solid rgba(200, 146, 42, 0.35);
+  border-radius: 4px;
+  color: var(--ce-cream);
   display: inline-flex;
-  font-size: 0.88rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  min-height: 40px;
-  padding: 0.45rem 0.85rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  margin-bottom: 1.35rem;
+  min-height: 38px;
+  padding: 0.4rem 0.85rem;
   text-decoration: none;
+  width: fit-content;
 }
 
 .concept-back-link:hover,
 .concept-back-link:focus-visible {
-  border-color: rgba(47, 116, 107, 0.42);
-  color: var(--teal);
+  border-color: var(--ce-gold-lt);
+  color: var(--ce-gold-lt);
 }
 
 .concept-explore-kicker {
-  color: var(--teal);
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  margin: 0 0 0.75rem;
+  color: var(--ce-gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  margin: 0 0 0.65rem;
   text-transform: uppercase;
 }
 
+.concept-explore-hero .concept-explore-kicker {
+  color: var(--ce-gold-lt);
+}
+
 .concept-explore-hero h1,
-.concept-example-head h2 {
-  color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.08;
+.concept-example-head h2,
+.concept-deep-head h2 {
+  font-family: "Playfair Display", Georgia, serif;
+  line-height: 1.12;
   margin: 0;
+  font-weight: 900;
 }
 
 .concept-explore-hero h1 {
-  font-size: clamp(2.4rem, 6vw, 4.8rem);
+  font-size: clamp(2rem, 5vw, 3.4rem);
   max-width: 880px;
+  color: var(--ce-cream);
 }
 
-.concept-explore-hero > p:last-child {
-  color: var(--muted);
-  font-size: clamp(1rem, 2vw, 1.14rem);
-  line-height: 1.75;
-  margin: 1.25rem 0 0;
-  max-width: 780px;
+.concept-explore-hero > p:last-of-type {
+  color: rgba(250, 247, 242, 0.72);
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  line-height: 1.7;
+  margin: 1.15rem auto 0;
+  max-width: 760px;
 }
 
 .concept-workspace {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
 }
 
 .concept-focus-panel,
 .concept-example-panel,
-.concept-check-panel {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  padding: clamp(1rem, 3vw, 1.35rem);
+.concept-check-panel,
+.concept-deep-card,
+.concept-proof-panel {
+  background: var(--ce-card);
+  border: 1px solid var(--ce-rule);
+  border-left: 4px solid var(--ce-gold);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 2px 12px rgba(22, 18, 10, 0.06);
+  padding: 1.25rem 1.35rem;
 }
 
 .concept-focus-panel {
-  align-self: start;
+  grid-row: span 2;
 }
 
-.concept-focus-panel p:last-child,
-.concept-example-panel p {
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 1rem 0 0;
+.concept-focus-panel p,
+.concept-example-panel > p,
+.concept-deep-card p,
+.concept-proof-panel p,
+.concept-deep-head p {
+  color: var(--ce-muted);
+  line-height: 1.65;
+  margin: 0.75rem 0 0;
 }
 
 .concept-formula,
-.concept-example-math {
-  background: rgba(47, 116, 107, 0.08);
-  border: 1px solid rgba(47, 116, 107, 0.18);
+.concept-example-math,
+.concept-deep-math {
+  background: var(--ce-parchment);
+  border: 1px solid var(--ce-rule);
   border-radius: 6px;
-  color: var(--ink);
-  line-height: 1.6;
   overflow-x: auto;
-  padding: 0.85rem;
-}
-
-.concept-example-panel {
-  min-height: 320px;
+  padding: 0.95rem 1.05rem;
+  margin: 0.75rem 0 0;
 }
 
 .concept-example-head {
-  align-items: start;
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: 0.35rem;
 }
 
 .concept-example-head h2 {
-  font-size: clamp(1.55rem, 3vw, 2.3rem);
+  font-size: 1.2rem;
+  color: var(--ce-ink);
 }
 
 .concept-example-tabs {
-  display: inline-flex;
+  display: flex;
   gap: 0.4rem;
 }
 
 .concept-example-tabs button {
-  align-items: center;
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--ce-rule);
+  border-radius: 4px;
+  background: var(--ce-parchment);
+  color: var(--ce-ink);
+  font-weight: 700;
   cursor: pointer;
-  display: inline-flex;
-  font-weight: 900;
-  height: 38px;
-  justify-content: center;
-  width: 38px;
+  font-family: "JetBrains Mono", monospace;
 }
 
 .concept-example-tabs button.is-active,
-.concept-example-tabs button:hover,
-.concept-example-tabs button:focus-visible {
-  background: var(--teal);
-  border-color: var(--teal);
-  color: white;
+.concept-example-tabs button:hover {
+  background: var(--ce-ink);
+  border-color: var(--ce-ink);
+  color: var(--ce-cream);
 }
 
 .concept-check-panel {
-  grid-column: 1 / -1;
+  grid-column: 2;
 }
 
 .concept-check-panel label {
+  display: flex;
   align-items: center;
-  color: var(--ink);
-  display: inline-flex;
-  font-weight: 900;
-  gap: 0.6rem;
-}
-
-.concept-check-panel input {
-  accent-color: var(--teal);
-  height: 18px;
-  width: 18px;
+  gap: 0.55rem;
+  font-weight: 700;
+  color: var(--ce-ink);
+  cursor: pointer;
 }
 
 .concept-check-panel ol {
-  color: var(--muted);
-  display: grid;
-  gap: 0.65rem;
-  line-height: 1.55;
-  margin: 1rem 0 0;
-  padding-left: 1.25rem;
+  margin: 0.85rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--ce-muted);
+  line-height: 1.6;
 }
 
 .concept-deep-dive {
-  margin-top: clamp(1.4rem, 4vw, 2.5rem);
+  margin-top: clamp(2rem, 5vw, 3.25rem);
 }
 
 .concept-deep-head {
-  border-top: 3px solid var(--teal);
-  padding-top: 1.3rem;
-}
-
-.concept-deep-head h2,
-.concept-deep-card h3,
-.concept-proof-panel h3 {
-  color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.12;
-  margin: 0;
+  margin-bottom: 1.15rem;
 }
 
 .concept-deep-head h2 {
-  font-size: clamp(1.7rem, 4vw, 2.75rem);
-}
-
-.concept-deep-head p:last-child {
-  color: var(--muted);
-  line-height: 1.75;
-  margin: 0.9rem 0 0;
-  max-width: 820px;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  color: var(--ce-ink);
+  margin-top: 0.25rem;
 }
 
 .concept-deep-grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 1rem;
-}
-
-.concept-deep-card,
-.concept-proof-panel {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  padding: clamp(1rem, 3vw, 1.3rem);
+  margin-bottom: 1rem;
 }
 
 .concept-deep-card h3,
 .concept-proof-panel h3 {
-  font-size: clamp(1.2rem, 2.5vw, 1.55rem);
-}
-
-.concept-deep-card p,
-.concept-proof-panel p {
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 0.75rem 0 0;
-}
-
-.concept-deep-math {
-  background: rgba(47, 116, 107, 0.08);
-  border: 1px solid rgba(47, 116, 107, 0.18);
-  border-radius: 6px;
-  color: var(--ink);
-  margin-top: 0.85rem;
-  overflow-x: auto;
-  padding: 0.8rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.1rem;
+  margin: 0;
+  color: var(--ce-ink);
 }
 
 .concept-proof-row {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  margin-top: 1rem;
-}
-
-.concept-proof-panel {
-  border-left: 4px solid var(--teal);
+  grid-template-columns: 1fr 1fr;
 }
 
 .concept-proof-panel--accent {
-  border-left-color: var(--gold);
+  border-left-color: #3a5f32;
+  background: #f0faf5;
 }
 
 .concept-proof-panel ol,
 .concept-proof-panel ul {
-  color: var(--muted);
-  display: grid;
-  gap: 0.65rem;
-  line-height: 1.6;
-  margin: 0.85rem 0 0;
-  padding-left: 1.25rem;
+  margin: 0.75rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--ce-muted);
+  line-height: 1.65;
 }
 
-@media (max-width: 820px) {
-  .concept-workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .concept-example-head {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
+@media (max-width: 900px) {
+  .concept-workspace,
   .concept-deep-grid,
   .concept-proof-row {
     grid-template-columns: 1fr;
+  }
+
+  .concept-focus-panel {
+    grid-row: auto;
+  }
+
+  .concept-check-panel {
+    grid-column: auto;
   }
 }

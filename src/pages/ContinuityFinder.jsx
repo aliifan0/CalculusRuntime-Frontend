@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import * as math from 'mathjs';
 import { latexToMathJs } from 'crosstex';
 import { InlineMath, renderLatexToElement } from '../components/Math';
+import HintButton from '../components/HintButton';
+import { useStepHints } from '../hooks/useStepHints';
 
 const ContinuityFinder = () => {
     const [variables, setVariables] = useState([{ name: 'x', value: '0' }, { name: 'y', value: '0' }]);
@@ -10,6 +12,16 @@ const ContinuityFinder = () => {
     const [showResult, setShowResult] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '' });
     const [analysisType, setAnalysisType] = useState('general'); // 'general' or 'point'
+    const hintResetKey = `${showResult}-${steps.length}-${result ?? ''}`;
+    const {
+        visibleCount,
+        total: hintTotal,
+        visibleSteps,
+        allRevealed,
+        feedback: hintFeedback,
+        revealHint,
+        resetHints,
+    } = useStepHints(steps, hintResetKey);
 
     const functionFieldRef = useRef(null);
     const mathFieldRef = useRef(null);
@@ -65,18 +77,18 @@ const ContinuityFinder = () => {
         });
     }, [demoExamples]);
 
-    // Render KaTeX for solution steps
+    // Render KaTeX for currently revealed solution steps
     useEffect(() => {
-        steps.forEach((step, index) => {
+        visibleSteps.forEach((step, index) => {
             if (step.math) {
                 renderLatexToElement(
-                    document.getElementById(`step-math-${index}`),
+                    document.getElementById(`hint-step-math-${index}`),
                     step.math,
                     { displayMode: true }
                 );
             }
         });
-    }, [steps]);
+    }, [visibleSteps]);
 
     // Scroll to results
     useEffect(() => {
@@ -138,6 +150,10 @@ const ContinuityFinder = () => {
             mathFieldRef.current.latex('');
             mathFieldRef.current.focus();
         }
+        setResult(null);
+        setSteps([]);
+        setShowResult(false);
+        resetHints();
     };
 
     const showToastMessage = (message) => {
@@ -1145,34 +1161,51 @@ const ContinuityFinder = () => {
                             🗑️ Clear
                         </button>
                     </div>
+
+                    <HintButton
+                        onReveal={revealHint}
+                        visibleCount={visibleCount}
+                        total={hintTotal}
+                        feedback={hintFeedback}
+                        disabled={!showResult}
+                    />
                 </div>
 
-                {/* Results */}
+                {/* Results — steps revealed gradually via Objective 12 hints */}
                 {showResult && (
                     <div className="result-section" ref={resultSectionRef}>
-                        <div className="answer-box">
-                            <div className="answer-label">
-                                Result:
-                            </div>
-                            <div className="answer-value">
-                                {result}
-                            </div>
-                        </div>
-
                         <div className="steps-box">
-                            <div className="steps-title">📝 Detailed Analysis</div>
-                            <div className="steps-content">
-                                {steps.map((step, index) => (
-                                    <div key={index} className="step-item">
-                                        <div className="step-number">{step.title}</div>
+                            <div className="steps-title">📝 Solution Hints</div>
+                            <div className="steps-content hint-steps">
+                                {visibleSteps.length === 0 && (
+                                    <div className="step-item">
+                                        <div className="step-content">
+                                            Analysis is ready. Press <strong>Show Me a Hint</strong> to reveal the first step.
+                                        </div>
+                                    </div>
+                                )}
+                                {visibleSteps.map((step, index) => (
+                                    <div key={index} className="step-item hint-step">
+                                        <div className="step-number hint-step__title">{step.title}</div>
                                         <div className="step-content">{renderExplanation(step.explanation)}</div>
                                         {step.math && (
-                                            <div className="step-math" id={`step-math-${index}`}></div>
+                                            <div className="step-math" id={`hint-step-math-${index}`}></div>
                                         )}
                                     </div>
                                 ))}
                             </div>
                         </div>
+
+                        {allRevealed && (
+                            <div className="answer-box">
+                                <div className="answer-label">
+                                    Result:
+                                </div>
+                                <div className="answer-value">
+                                    {result}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 

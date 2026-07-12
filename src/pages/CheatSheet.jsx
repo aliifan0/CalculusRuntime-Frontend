@@ -8,11 +8,15 @@ import html2canvas from "html2canvas";
 // ─── Topic key → progress key mapping ────────────────────────────────────────
 // Adjust these keys to match what your ProgressContext actually stores
 const TOPIC_PROGRESS_KEYS = {
-  "partial-derivatives": ["partial-derivatives/1", "partial-derivatives/2"],
-  "vector-calculus":     ["vector-calculus/1",     "vector-calculus/2"],
-  "limits-continuity":   ["limits-continuity/1",   "limits-continuity/2"],
-  "multiple-integrals":  ["multiple-integrals/1",  "multiple-integrals/2"],
-  extrema:               ["extreme"],
+  "partial-derivatives": ["partial-derivatives/1", "partial-derivatives/2", "vector-1", "partial-1"],
+  "vector-calculus":     ["vector-calculus/1", "vector-calculus/2", "vector-1", "vector-2"],
+  "limits-continuity":   ["limits-continuity/1", "limits-continuity/2", "limits-1", "limits-2"],
+  "multiple-integrals":  ["multiple-integrals/1", "multiple-integrals/2", "integrals-1", "integrals-2"],
+  extrema:               ["extreme", "extrema"],
+  "taylor-series":       ["taylor-series/1", "taylor-series/2", "taylor-1", "taylor-2"],
+  "lagrange-multipliers": ["lagrange-multipliers/1", "lagrange-multipliers/2", "lagrange-1", "lagrange-2"],
+  "stokes-theorem":      ["stokes-theorem/1", "stokes-theorem/2", "stokes-1", "stokes-2"],
+  "divergence-curl":     ["divergence/1", "divergence/2", "divergence-1", "divergence-2"],
 };
 
 export default function CheatSheet() {

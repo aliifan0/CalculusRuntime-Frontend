@@ -1,10 +1,45 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
-import Skeleton from "../components/Skeleton";
 
 const guideCards = [
+  {
+    title: "Calculus and Analytical Geometry",
+    description:
+      "Single-variable foundations: functions, continuity, derivatives, Taylor ideas, and geometric intuition.",
+    path: "/courses/calculus-analytical-geometry",
+    meta: "Course path · Foundations",
+    icon: "ƒ",
+    color: "gold",
+  },
+  {
+    title: "Multi Variable Calculus",
+    description:
+      "Partial derivatives, vector calculus, limits, multiple integrals, Lagrange multipliers, and divergence & curl.",
+    path: "/courses/multivariable-calculus",
+    meta: "Course path · Full study guides",
+    icon: "∂",
+    color: "teal",
+  },
+  {
+    title: "Linear Algebra",
+    description:
+      "Vectors, matrices, linear systems, and the algebraic toolkit used across calculus and data science.",
+    path: "/courses/linear-algebra",
+    meta: "Course path · Modules",
+    icon: "A",
+    color: "blue",
+  },
+  {
+    title: "Probability and Statistics",
+    description:
+      "Probability models, random variables, distributions, and statistical reasoning for science and engineering.",
+    path: "/courses/probability-statistics",
+    meta: "Course path · Modules",
+    icon: "P",
+    color: "purple",
+  },
   {
     title: "Simple Concepts",
     description:
@@ -51,6 +86,51 @@ const guideCards = [
   icon: "\u222c",
   color: "teal",
 },
+  {
+    title: "Taylor Series",
+    description:
+      "Local linear and higher-order approximations, Maclaurin catalogs, convergence, and error bounds.",
+    path: "/taylor-series/1",
+    meta: "2 parts · MCQ practice · Formula review",
+    icon: "Σ",
+    color: "gold",
+  },
+  {
+    title: "Lagrange Multipliers",
+    description:
+      "Constrained optimization via gradient alignment, dual constraints, and worked applications.",
+    path: "/lagrange-multipliers/1",
+    meta: "2 parts · MCQ practice · Applications",
+    icon: "λ",
+    color: "purple",
+  },
+  {
+    title: "Divergence & Curl",
+    description:
+      "Vector field operators, identities, the divergence theorem, and Stokes connections.",
+    path: "/divergence-curl/1",
+    meta: "2 parts · Theorems · MCQ practice",
+    icon: "∇·",
+    color: "blue",
+  },
+  {
+    title: "Stokes' Theorem",
+    description:
+      "Circulation, oriented surfaces, and Stokes applications (linked with Divergence & Curl).",
+    path: "/stokes-theorem/1",
+    meta: "Study guide · Theorem applications",
+    icon: "∮",
+    color: "teal",
+  },
+  {
+    title: "Practice Section",
+    description:
+      "Focused MCQ arena across Lagrange, divergence, Stokes, Taylor, and related modules.",
+    path: "/practice",
+    meta: "Interactive · Difficulty tiers",
+    icon: "✎",
+    color: "gold",
+  },
 ];
 
 const toolLinks = [
@@ -89,49 +169,20 @@ function Home() {
   const [query, setQuery] = useState("");
   const { user } = useAuth();
   const { stats } = useProgress();
-  const [indexItems, setIndexItems] = useState([]);
-  const [loadingIndex, setLoadingIndex] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    setLoadingIndex(true);
-    import("../data/guideIndex.json")
-      .then((module) => {
-        if (!active) return;
-        const pages = (module.default || module).map((page) => ({
-          title: page.title,
-          description: page.excerpt || page.description || "",
-          path: page.path,
-          type: "page",
-        }));
-        setIndexItems(pages);
-      })
-      .catch(() => {
-        if (active) setIndexItems([]);
-      })
-      .finally(() => {
-        if (active) setLoadingIndex(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim();
-    const allItems = [...baseItems, ...indexItems];
-    if (!q) return allItems;
-    return allItems.filter(
+    if (!q) return baseItems;
+    return baseItems.filter(
       (item) =>
         item.title?.toLowerCase().includes(q) ||
         item.description?.toLowerCase().includes(q) ||
         item.desc?.toLowerCase().includes(q) ||
         item.label?.toLowerCase().includes(q),
     );
-  }, [query, indexItems]);
+  }, [query]);
 
   const filteredGuides = filtered.filter((i) => i.type === "guide");
-  const filteredPages = filtered.filter((i) => i.type === "page");
   const filteredTools = filtered.filter((i) => i.type === "tool");
 
   return (
@@ -202,15 +253,7 @@ function Home() {
       </div>
 
       {/* No results */}
-      {loadingIndex ? (
-        <div className="home-no-results">
-          <span>Loading content…</span>
-          <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-            <Skeleton />
-            <Skeleton />
-          </div>
-        </div>
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="home-no-results">
           <span>Nothing matched "{query}".</span>
         </div>
@@ -269,27 +312,6 @@ function Home() {
             </div>
           </div>
           <Link to="/ai-solver" className="ai-feature-btn">Try the solver →</Link>
-        </section>
-      )}
-
-      {/* Matched guide pages */}
-      {filteredPages.length > 0 && (
-        <section className="guide-section" aria-labelledby="page-heading">
-          <div className="section-kicker">Guide Pages</div>
-          <h2 id="page-heading">Matching pages</h2>
-          <div className="guide-grid">
-            {filteredPages.map((page) => (
-              <Link
-                className="guide-card guide-card--neutral"
-                key={page.path}
-                to={page.path}
-              >
-                <div className="guide-card-icon">📄</div>
-                <span>{page.excerpt}</span>
-                <h3>{page.title}</h3>
-              </Link>
-            ))}
-          </div>
         </section>
       )}
 

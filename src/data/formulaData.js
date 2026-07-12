@@ -206,6 +206,169 @@ const formulaData = {
       },
     ],
   },
+
+  "taylor-series": {
+    title: "Taylor Series",
+    color: "#f6d365",
+    formulas: [
+      {
+        name: "1-Variable Taylor Polynomial",
+        formula: "Pₙ(x) = Σₖ₌₀ⁿ f⁽ᵏ⁾(a)/k! · (x-a)ᵏ",
+        note: "Local polynomial approximation about x = a",
+      },
+      {
+        name: "Maclaurin Series",
+        formula: "f(x) = Σₖ₌₀^∞ f⁽ᵏ⁾(0)/k! · xᵏ",
+        note: "Taylor series centered at 0",
+      },
+      {
+        name: "Multivariable Linear Approximation",
+        formula: "f(x,y) ≈ f(a,b) + fₓ(a,b)(x-a) + f_y(a,b)(y-b)",
+        note: "First-order (tangent plane) approximation",
+      },
+      {
+        name: "Quadratic Approximation (2D)",
+        formula: "f ≈ f(a,b) + fₓΔx + f_yΔy + ½(fₓₓΔx² + 2fₓyΔxΔy + f_yyΔy²)",
+        note: "Δx = x-a, Δy = y-b",
+      },
+      {
+        name: "Lagrange Remainder (1D)",
+        formula: "Rₙ(x) = f⁽ⁿ⁺¹⁾(c)/(n+1)! · (x-a)ⁿ⁺¹",
+        note: "Exact error for some c between a and x",
+      },
+      {
+        name: "Common Series: eˣ",
+        formula: "eˣ = 1 + x + x²/2! + x³/3! + …",
+        note: "Converges for all x",
+      },
+      {
+        name: "Common Series: sin x",
+        formula: "sin x = x - x³/3! + x⁵/5! - …",
+        note: "Odd powers only",
+      },
+      {
+        name: "Common Series: cos x",
+        formula: "cos x = 1 - x²/2! + x⁴/4! - …",
+        note: "Even powers only",
+      },
+    ],
+  },
+
+  "lagrange-multipliers": {
+    title: "Lagrange Multipliers",
+    color: "#a18cd1",
+    formulas: [
+      {
+        name: "Single Constraint",
+        formula: "∇f = λ∇g  and  g(x) = c",
+        note: "f extremized on the level set g = c",
+      },
+      {
+        name: "Geometric Meaning",
+        formula: "Level curves of f and g are tangent",
+        note: "Gradients are parallel at constrained extrema",
+      },
+      {
+        name: "Two Constraints",
+        formula: "∇f = λ∇g + μ∇h,  g = c₁,  h = c₂",
+        note: "Intersection of two constraint surfaces",
+      },
+      {
+        name: "System to Solve",
+        formula: "fₓ = λ gₓ,  f_y = λ g_y,  g(x,y) = c",
+        note: "n + 1 equations in n + 1 unknowns (incl. λ)",
+      },
+      {
+        name: "When Gradients Vanish",
+        formula: "If ∇g = 0 at a candidate, check separately",
+        note: "Lagrange method assumes ∇g ≠ 0 on the constraint",
+      },
+      {
+        name: "Closed Bounded Set",
+        formula: "Check critical points inside + boundary via Lagrange",
+        note: "Extreme Value Theorem guarantees max/min exist",
+      },
+    ],
+  },
+
+  "stokes-theorem": {
+    title: "Stokes' Theorem",
+    color: "#84fab0",
+    formulas: [
+      {
+        name: "Stokes' Theorem",
+        formula: "∬_S (∇×F)·dS = ∮_∂S F·dr",
+        note: "Curl flux through S equals circulation on boundary",
+      },
+      {
+        name: "Orientation",
+        formula: "Right-hand rule: fingers along ∂S, thumb = normal",
+        note: "Boundary orientation must match surface normal",
+      },
+      {
+        name: "Curl in Components",
+        formula: "∇×F = ⟨∂R/∂y-∂Q/∂z, ∂P/∂z-∂R/∂x, ∂Q/∂x-∂P/∂y⟩",
+        note: "F = ⟨P, Q, R⟩",
+      },
+      {
+        name: "Surface Element",
+        formula: "dS = n̂ dS = (r_u × r_v) du dv",
+        note: "From a parametrization r(u,v)",
+      },
+      {
+        name: "Special Case: Green's Theorem",
+        formula: "∮_C P dx + Q dy = ∬_D (∂Q/∂x - ∂P/∂y) dA",
+        note: "Stokes in the plane with upward normal",
+      },
+      {
+        name: "Conservative Shortcut",
+        formula: "If ∇×F = 0, then ∮_C F·dr = 0 on closed curves",
+        note: "In simply connected domains",
+      },
+    ],
+  },
+
+  "divergence-curl": {
+    title: "Divergence & Curl",
+    color: "#89f7fe",
+    formulas: [
+      {
+        name: "Divergence",
+        formula: "∇·F = ∂P/∂x + ∂Q/∂y + ∂R/∂z",
+        note: "Net outward flux per unit volume",
+      },
+      {
+        name: "Curl",
+        formula: "∇×F = | i     j     k  |\n        | ∂/∂x  ∂/∂y  ∂/∂z|\n        | P     Q     R  |",
+        note: "Local rotation of the field",
+      },
+      {
+        name: "Divergence Theorem",
+        formula: "∬_S F·dS = ∭_E (∇·F) dV",
+        note: "Closed surface flux = volume integral of div",
+      },
+      {
+        name: "Identity: div(curl F)",
+        formula: "∇·(∇×F) = 0",
+        note: "Curl fields are solenoidal",
+      },
+      {
+        name: "Identity: curl(grad f)",
+        formula: "∇×(∇f) = 0",
+        note: "Gradient fields are irrotational",
+      },
+      {
+        name: "Product Rule (div)",
+        formula: "∇·(fF) = ∇f·F + f(∇·F)",
+        note: "Scalar times vector field",
+      },
+      {
+        name: "Product Rule (curl)",
+        formula: "∇×(fF) = ∇f×F + f(∇×F)",
+        note: "Useful in electromagnetic identities",
+      },
+    ],
+  },
 };
 
 export default formulaData;

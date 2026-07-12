@@ -46,6 +46,46 @@ const CURRICULUM = [
       { id: "integrals-2", label: "Part 2 — Triple Integrals & Coordinates", path: "/multiple-integrals/2" },
     ],
   },
+  {
+    id: "taylor",
+    title: "Taylor Series",
+    icon: "Σ",
+    color: "gold",
+    parts: [
+      { id: "taylor-1", label: "Part 1 — Foundations & Maclaurin", path: "/taylor-series/1" },
+      { id: "taylor-2", label: "Part 2 — Convergence & Error Bounds", path: "/taylor-series/2" },
+    ],
+  },
+  {
+    id: "lagrange",
+    title: "Lagrange Multipliers",
+    icon: "λ",
+    color: "purple",
+    parts: [
+      { id: "lagrange-1", label: "Part 1 — Geometric Intuition & Alignment", path: "/lagrange-multipliers/1" },
+      { id: "lagrange-2", label: "Part 2 — Applications & Multi-Constraints", path: "/lagrange-multipliers/2" },
+    ],
+  },
+  {
+    id: "divergence",
+    title: "Divergence & Curl",
+    icon: "∇·",
+    color: "blue",
+    parts: [
+      { id: "divergence-1", label: "Part 1 — Operators & Vector Fields", path: "/divergence-curl/1" },
+      { id: "divergence-2", label: "Part 2 — Identities & Theorems", path: "/divergence-curl/2" },
+    ],
+  },
+  {
+    id: "stokes",
+    title: "Stokes' Theorem",
+    icon: "∮",
+    color: "teal",
+    parts: [
+      { id: "stokes-1", label: "Part 1 — Circulation & The Statement", path: "/stokes-theorem/1" },
+      { id: "stokes-2", label: "Part 2 — Applications & Workflows", path: "/stokes-theorem/2" },
+    ],
+  },
 ];
 
 const TOOLS = [
@@ -53,6 +93,8 @@ const TOOLS = [
   { label: "Extreme Value Finder", path: "/extreme", icon: "⬆" },
   { label: "Volume Calculator", path: "/volumecalculator", icon: "∬" },
   { label: "AI Calculus Solver", path: "/ai-solver", icon: "🤖" },
+  { label: "Practice Section", path: "/practice", icon: "✎" },
+  { label: "Leaderboard", path: "/leaderboard", icon: "🏆" },
 ];
 
 function ProgressBar({ value, max }) {

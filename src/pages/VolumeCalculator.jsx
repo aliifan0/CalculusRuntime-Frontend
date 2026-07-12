@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { InlineMath, BlockMath } from "../components/Math";
+import HintButton from "../components/HintButton";
+import { useStepHints } from "../hooks/useStepHints";
 
 // ============================================================================
 // ENHANCED DOUBLE INTEGRAL SOLVER — All Complex Cases
@@ -118,6 +120,13 @@ const integralLatex = (integrand, bounds, order) => {
 
 const mathEval = (() => {
     const CONSTANTS = { pi: Math.PI, e: Math.E, inf: Infinity, infinity: Infinity, '∞': Infinity };
+    const FUN_NAMES = new Set([
+        'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'atan2',
+        'sinh', 'cosh', 'tanh', 'sec', 'csc', 'cot',
+        'sqrt', 'cbrt', 'pow', 'exp', 'log', 'ln', 'log10', 'log2',
+        'abs', 'sign', 'ceil', 'floor', 'round', 'max', 'min',
+        'gamma', 'fact', 'besselj0', 'erf', 'heaviside', 'sinc', 'dirac',
+    ]);
 
     const tokenise = (src) => {
         const tokens = [];
@@ -149,7 +158,13 @@ const mathEval = (() => {
                 const cur = tokens[k], nxt = tokens[k + 1];
                 const curIsVal = cur.type === 'NUM' || cur.type === 'NAME' || (cur.type === 'SYM' && cur.val === ')');
                 const nxtIsVal = nxt.type === 'NAME' || (nxt.type === 'SYM' && nxt.val === '(');
-                if (curIsVal && nxtIsVal) out.push({ type: 'SYM', val: '*' });
+                // Do not treat known functions as values before '(': gamma(x) must stay a call, not gamma*(x)
+                const curIsFunctionCall =
+                    cur.type === 'NAME' &&
+                    nxt.type === 'SYM' &&
+                    nxt.val === '(' &&
+                    FUN_NAMES.has(String(cur.val).toLowerCase());
+                if (curIsVal && nxtIsVal && !curIsFunctionCall) out.push({ type: 'SYM', val: '*' });
             }
         }
         return out;
@@ -326,24 +341,61 @@ function gaussLegendre15(f, a, b, panels = 100) {
     return total;
 }
 
-function handleInfiniteBounds(f, a, b) {
+function handleInfiniteBounds(f, a, b, panels = 16) {
+    // Modest panels: nested improper integrals multiply cost (outer × inner).
+    const n = Math.min(panels, 20);
     if (!isFinite(a) && !isFinite(b)) {
-        return gaussLegendre15((t) => { const x = t / (1 - t * t), w = (1 + t * t) / Math.pow(1 - t * t, 2); return f(x) * w; }, -0.9999, 0.9999, 200);
+        return gaussLegendre15((t) => { const x = t / (1 - t * t), w = (1 + t * t) / Math.pow(1 - t * t, 2); return f(x) * w; }, -0.9999, 0.9999, n);
     }
     if (!isFinite(b)) {
-        return gaussLegendre15((t) => { const x = a + t / (1 - t), w = 1 / Math.pow(1 - t, 2); return f(x) * w; }, 0.0001, 0.9999, 200);
+        return gaussLegendre15((t) => { const x = a + t / (1 - t), w = 1 / Math.pow(1 - t, 2); return f(x) * w; }, 0.0001, 0.9999, n);
     }
     if (!isFinite(a)) {
-        return gaussLegendre15((t) => { const x = b - (1 - t) / t, w = 1 / (t * t); return f(x) * w; }, 0.0001, 0.9999, 200);
+        return gaussLegendre15((t) => { const x = b - (1 - t) / t, w = 1 / (t * t); return f(x) * w; }, 0.0001, 0.9999, n);
     }
     return 0;
 }
 
 function integrate1DSmart(f, a, b, opts = {}) {
-    const { oscillatory = false, singular = false, eps = 1e-10 } = opts;
-    if (!isFinite(a) || !isFinite(b)) return handleInfiniteBounds(f, a, b);
-    if (singular || oscillatory) return adaptiveSimpson(f, a, b, eps, 25);
-    return gaussLegendre15(f, a, b, 150);
+    const { singular = false, eps = 1e-5, panels } = opts;
+    const n = Math.min(panels ?? 20, 24);
+    if (!isFinite(a) || !isFinite(b)) return handleInfiniteBounds(f, a, b, n);
+    // Never use adaptive Simpson for nested double integrals — it can recurse for
+    // millions of nodes on oscillatory/Fresnel-type integrands and freeze the page.
+    if (singular) return adaptiveSimpson(f, a, b, eps, 10);
+    return gaussLegendre15(f, a, b, n);
+}
+
+/** If integrand is f(x)*g(y) with constant rectangular bounds, integrate as a product. */
+function trySeparableProduct(integrand, bounds, order) {
+    const clean = integrand.replace(/\s+/g, '');
+    // Match patterns like sin(x^2)*cos(y^2) or sin(100*x)*cos(100*y)
+    const m = clean.match(/^([A-Za-z0-9_^().+\-*/]+)\*([A-Za-z0-9_^().+\-*/]+)$/);
+    if (!m) return null;
+    const left = m[1];
+    const right = m[2];
+    const leftHasX = /\bx\b/.test(left);
+    const leftHasY = /\by\b/.test(left);
+    const rightHasX = /\bx\b/.test(right);
+    const rightHasY = /\by\b/.test(right);
+    if (leftHasX && leftHasY) return null;
+    if (rightHasX && rightHasY) return null;
+    if (!(leftHasX || rightHasX) || !(leftHasY || rightHasY)) return null;
+
+    const fx = leftHasX ? left : right;
+    const gy = leftHasY ? left : right;
+    try {
+        const xLo = evalBound(bounds.xMin);
+        const xHi = evalBound(bounds.xMax);
+        const yLo = evalBound(bounds.yMin);
+        const yHi = evalBound(bounds.yMax);
+        if (![xLo, xHi, yLo, yHi].every(Number.isFinite)) return null;
+        const Ix = integrate1DSmart((x) => mathEval.evaluate(fx, { x, y: 0 }), xLo, xHi, { panels: 48 });
+        const Iy = integrate1DSmart((y) => mathEval.evaluate(gy, { x: 0, y }), yLo, yHi, { panels: 48 });
+        return Ix * Iy;
+    } catch {
+        return null;
+    }
 }
 
 function evalBound(expr, scope = {}) {
@@ -370,12 +422,21 @@ const ANALYTICAL_DATABASE = [
     { pattern: /^x\^2\+y\^2$/, result: "8/3", check: (b) => b.xMin === "-1" && b.xMax === "1" && b.yMin === "-1" && b.yMax === "1" },
     { pattern: /^x\*y$/, result: "9", check: (b) => b.xMin === "0" && b.xMax === "2" && b.yMin === "0" && b.yMax === "3" },
     { pattern: /^x\+y$/, result: "1/3", check: (b) => b.xMin === "0" && b.xMax === "1" && b.yMax === "1-x" },
+    // ∫_0^∞ ∫_1^2 e^{-xy} dy dx = ln(2)
+    { pattern: /^exp\(-x\*y\)$/, result: "ln(2)", numeric: Math.LN2, check: (b) => b.xMin === "0" && b.xMax === "inf" && b.yMin === "1" && b.yMax === "2" },
+    { pattern: /^e\^\(-x\*y\)$/, result: "ln(2)", numeric: Math.LN2, check: (b) => b.xMin === "0" && b.xMax === "inf" && b.yMin === "1" && b.yMax === "2" },
+    // Separable oscillatory: ∫sin(100x)dx · ∫cos(100y)dy over [0,2π]² = 0
+    { pattern: /^sin\(100\*x\)\*cos\(100\*y\)$/, result: "0", numeric: 0, check: (b) => b.xMin === "0" && b.xMax === "2*pi" && b.yMin === "0" && b.yMax === "2*pi" },
+    // Default demo: ∫_0^∞ ∫_0^∞ x y e^{-x²-y²} dy dx = 1/4
+    { pattern: /^x\*y\*exp\(-x\^2-y\^2\)$/, result: "1/4", numeric: 0.25, check: (b) => b.xMin === "0" && b.xMax === "inf" && b.yMin === "0" && b.yMax === "inf" },
+    // Gaussian over ℝ²: ∫∫ e^{-(x²+y²)} = π
+    { pattern: /^exp\(-x\^2-y\^2\)$/, result: "π", numeric: Math.PI, check: (b) => b.xMin === "-inf" && b.xMax === "inf" && b.yMin === "-inf" && b.yMax === "inf" },
 ];
 
 function getAnalyticalForm(integrand, bounds) {
     const clean = integrand.replace(/\s+/g, '').toLowerCase();
     for (const entry of ANALYTICAL_DATABASE) {
-        if (entry.pattern.test(clean) && entry.check(bounds)) return entry.result;
+        if (entry.pattern.test(clean) && entry.check(bounds)) return entry;
     }
     return null;
 }
@@ -430,7 +491,8 @@ function solveDoubleIntegral(integrand, bounds, order, opts = {}) {
         });
     }
 
-    const analytical = getAnalyticalForm(integrand, bounds);
+    const analyticalEntry = getAnalyticalForm(integrand, bounds);
+    const analytical = analyticalEntry?.result || null;
     if (analytical) {
         steps.push({
             title: 'Analytical Solution',
@@ -440,7 +502,7 @@ function solveDoubleIntegral(integrand, bounds, order, opts = {}) {
         });
     }
 
-    if (hasInf) {
+    if (hasInf && !analyticalEntry?.numeric) {
         steps.push({
             title: 'Improper Integral',
             content: 'Using variable transformation for infinite bounds',
@@ -450,29 +512,58 @@ function solveDoubleIntegral(integrand, bounds, order, opts = {}) {
     }
 
     let result, innerEvals = 0, outerEvals = 0;
-    if (order === 'dydx') {
-        result = integrate1DSmart((x) => {
-            outerEvals++;
-            const yLo = evalBound(innerMin, { x });
-            const yHi = evalBound(innerMax, { x });
-            if (yLo >= yHi) return 0;
-            return integrate1DSmart((y) => { innerEvals++; return mathEval.evaluate(integrand, { x, y }); }, yLo, yHi, { oscillatory: integrand.includes('sin') || integrand.includes('cos') });
-        }, outerMinVal, outerMaxVal, { oscillatory: integrand.includes('sin') || integrand.includes('cos') });
-    } else {
-        result = integrate1DSmart((y) => {
-            outerEvals++;
-            const xLo = evalBound(innerMin, { y });
-            const xHi = evalBound(innerMax, { y });
-            if (xLo >= xHi) return 0;
-            return integrate1DSmart((x) => { innerEvals++; return mathEval.evaluate(integrand, { x, y }); }, xLo, xHi, { oscillatory: integrand.includes('sin') || integrand.includes('cos') });
-        }, outerMinVal, outerMaxVal, { oscillatory: integrand.includes('sin') || integrand.includes('cos') });
-    }
 
-    steps.push({
-        title: 'Computation Stats',
-        content: 'Numerical integration completed:',
-        formula: `Evaluations: ${outerEvals} outer × ~${Math.round(innerEvals / outerEvals)} inner = ~${innerEvals.toLocaleString()} total`
-    });
+    if (typeof analyticalEntry?.numeric === 'number') {
+        result = analyticalEntry.numeric;
+        steps.push({
+            title: 'Computation Stats',
+            content: 'Closed-form evaluation used (numerical quadrature skipped):',
+            formula: `Exact value ≈ ${result.toFixed(12)}`
+        });
+    } else {
+        const separable = innerConst
+            ? trySeparableProduct(integrand, bounds, order)
+            : null;
+        if (typeof separable === 'number' && Number.isFinite(separable)) {
+            result = separable;
+            steps.push({
+                title: 'Separable Product',
+                content: 'Integrand factors as f(x)·g(y) on a rectangle — integrated as a product of 1D integrals:',
+                formula: `Result ≈ ${result.toFixed(12)}`
+            });
+        } else {
+            // Keep nested quadrature cheap so the UI never freezes on presets.
+            const special = /bessel|gamma|erf|sinc/i.test(integrand);
+            const nestedPanels = hasInf || special ? 10 : 14;
+            if (order === 'dydx') {
+                result = integrate1DSmart((x) => {
+                    outerEvals++;
+                    const yLo = evalBound(innerMin, { x });
+                    const yHi = evalBound(innerMax, { x });
+                    if (yLo >= yHi) return 0;
+                    return integrate1DSmart((y) => { innerEvals++; return mathEval.evaluate(integrand, { x, y }); }, yLo, yHi, {
+                        panels: nestedPanels,
+                    });
+                }, outerMinVal, outerMaxVal, { panels: nestedPanels });
+            } else {
+                result = integrate1DSmart((y) => {
+                    outerEvals++;
+                    const xLo = evalBound(innerMin, { y });
+                    const xHi = evalBound(innerMax, { y });
+                    if (xLo >= xHi) return 0;
+                    return integrate1DSmart((x) => { innerEvals++; return mathEval.evaluate(integrand, { x, y }); }, xLo, xHi, {
+                        panels: nestedPanels,
+                    });
+                }, outerMinVal, outerMaxVal, { panels: nestedPanels });
+            }
+
+            steps.push({
+                title: 'Computation Stats',
+                content: 'Numerical integration completed:',
+                formula: `Evaluations: ${outerEvals} outer × ~${Math.round(innerEvals / Math.max(outerEvals, 1))} inner = ~${innerEvals.toLocaleString()} total`
+            });
+        }
+    }
 
     steps.push({
         title: 'Final Result',
@@ -501,9 +592,30 @@ export default function DoubleIntegralSolver() {
     const [order, setOrder] = useState('dydx');
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
-    const [showSteps] = useState(true);
     const [activeCat, setActiveCat] = useState(0);
     const [computing, setComputing] = useState(false);
+
+    const hintSteps = useMemo(() => {
+        if (!result?.steps?.length) return [];
+        return result.steps.map((step, i) => ({
+            title: `Step ${i + 1}: ${step.title}`,
+            body: step.content,
+            formula: step.formula,
+            formulaLatex: step.formulaLatex,
+        }));
+    }, [result]);
+    const hintResetKey = result
+        ? `${integrand}|${xMin}|${xMax}|${yMin}|${yMax}|${order}|${result.result}`
+        : "";
+    const {
+        visibleCount,
+        total: hintTotal,
+        visibleSteps,
+        allRevealed,
+        feedback: hintFeedback,
+        revealHint,
+        resetHints,
+    } = useStepHints(hintSteps, hintResetKey);
     const integrandFieldRef = useRef(null);
     const integrandMathRef = useRef(null);
 
@@ -517,9 +629,7 @@ export default function DoubleIntegralSolver() {
                 edit: () => {
                     setIntegrand(latexToSolverExpression(mathField.latex()));
                 },
-                enter: () => {
-                    solve();
-                }
+                // Do not auto-solve on Enter — oscillatory/improper integrals can freeze the tab.
             }
         });
 
@@ -537,21 +647,32 @@ export default function DoubleIntegralSolver() {
         setYMin(p.yMin); setYMax(p.yMax);
         setOrder(p.order);
         setError(''); setResult(null);
+        resetHints();
     };
 
     function solve() {
+        if (computing) return;
         setComputing(true);
         setError('');
-        setTimeout(() => {
-            try {
-                const res = solveDoubleIntegral(integrand, { xMin, xMax, yMin, yMax }, order, {});
-                setResult(res);
-            } catch (err) {
-                setError(err.message);
-                setResult(null);
-            }
-            setComputing(false);
-        }, 100);
+        setResult(null);
+        // Double-yield so React can paint "Computing..." before heavy work.
+        window.setTimeout(() => {
+            window.setTimeout(() => {
+                const started = performance.now();
+                try {
+                    const res = solveDoubleIntegral(integrand, { xMin, xMax, yMin, yMax }, order, {});
+                    setResult(res);
+                    if (performance.now() - started > 8000) {
+                        console.warn("Integral solve took", Math.round(performance.now() - started), "ms");
+                    }
+                } catch (err) {
+                    setError(err.message || String(err));
+                    setResult(null);
+                } finally {
+                    setComputing(false);
+                }
+            }, 0);
+        }, 40);
     }
 
     return (
@@ -601,6 +722,12 @@ export default function DoubleIntegralSolver() {
                                     setIntegrand(e.target.value);
                                     if (integrandMathRef.current) {
                                         integrandMathRef.current.latex(solverExpressionToLatex(e.target.value));
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        // Require explicit Solve click — Enter must not freeze on hard presets.
                                     }
                                 }}
                                 style={{ width: '100%', marginTop: '8px', padding: '9px 10px', fontSize: '12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontFamily: 'monospace', color: 'var(--cv-text-secondary)' }}
@@ -653,13 +780,21 @@ export default function DoubleIntegralSolver() {
                             onClick={solve}
                             disabled={computing}
                             className={`cv-btn ${computing ? 'cv-btn--function' : 'cv-btn--equals'}`}
-                            style={{ width: '100%', fontSize: '15px', fontWeight: '700', marginBottom: '20px', borderRadius: '10px', minHeight: '52px' }}
+                            style={{ width: '100%', fontSize: '15px', fontWeight: '700', marginBottom: '12px', borderRadius: '10px', minHeight: '52px' }}
                         >
                             {computing ? 'Computing...' : '🧮 Solve Integral'}
                         </button>
 
+                        <HintButton
+                            onReveal={revealHint}
+                            visibleCount={visibleCount}
+                            total={hintTotal}
+                            feedback={hintFeedback}
+                            disabled={!result}
+                        />
+
                         {/* Presets */}
-                        <div style={{ padding: '16px', background: 'var(--cv-bg-sunken)', borderRadius: '12px', border: '1px solid var(--cv-border)' }}>
+                        <div style={{ padding: '16px', background: 'var(--cv-bg-sunken)', borderRadius: '12px', border: '1px solid var(--cv-border)', marginTop: '12px' }}>
                             <h3 style={{ margin: '0 0 12px', fontSize: '12px', fontWeight: '700', color: 'var(--cv-text-primary)', textTransform: 'uppercase' }}>
                                 Preset Problems
                             </h3>
@@ -704,24 +839,18 @@ export default function DoubleIntegralSolver() {
 
                         {result && (
                             <div>
-                                <div style={{ padding: '16px', background: 'var(--cv-accent-light)', borderRadius: '12px', marginBottom: '16px', border: '2px solid var(--cv-border)' }}>
-                                    <div style={{ fontSize: '11px', color: 'var(--cv-text-secondary)', marginBottom: '4px', fontWeight: '600' }}>RESULT</div>
-                                    <div style={{ fontSize: '2em', fontWeight: '800', color: 'var(--cv-accent)', fontFamily: 'monospace' }}>
-                                        {result.result.toFixed(10)}
+                                {visibleSteps.length === 0 && (
+                                    <div style={{ padding: '12px', background: 'var(--cv-bg-sunken)', borderRadius: '8px', marginBottom: '12px', color: 'var(--cv-text-secondary)', fontSize: '13px' }}>
+                                        Solution is ready. Press <strong>Show Me a Hint</strong> to reveal steps one at a time.
                                     </div>
-                                    {result.analytical && (
-                                        <div style={{ marginTop: '8px', padding: '8px', background: 'var(--cv-success-light)', borderRadius: '6px', fontSize: '13px', color: 'var(--cv-success)' }}>
-                                            Analytical: {result.analytical}
-                                        </div>
-                                    )}
-                                </div>
+                                )}
 
-                                {showSteps && result.steps.map((step, i) => (
+                                {visibleSteps.map((step, i) => (
                                     <div key={i} style={{ marginBottom: '12px', padding: '12px', background: 'var(--cv-bg-sunken)', borderRadius: '8px', borderLeft: '4px solid var(--cv-accent)' }}>
                                         <div style={{ fontWeight: '700', color: 'var(--cv-accent)', marginBottom: '4px', fontSize: '12px' }}>
-                                            Step {i + 1}: {step.title}
+                                            {step.title}
                                         </div>
-                                        <div style={{ fontSize: '12px', color: 'var(--cv-text-secondary)', marginBottom: '4px' }}>{step.content}</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--cv-text-secondary)', marginBottom: '4px' }}>{step.body}</div>
                                         <div style={{ padding: '8px', background: 'var(--cv-bg-surface)', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', border: '1px solid var(--cv-border)', whiteSpace: 'pre-wrap', color: 'var(--cv-text-primary)' }}>
                                             {step.formulaLatex ? (
                                                 <LatexMath latex={step.formulaLatex} displayMode />
@@ -731,6 +860,20 @@ export default function DoubleIntegralSolver() {
                                         </div>
                                     </div>
                                 ))}
+
+                                {allRevealed && (
+                                    <div style={{ padding: '16px', background: 'var(--cv-accent-light)', borderRadius: '12px', marginBottom: '16px', border: '2px solid var(--cv-border)' }}>
+                                        <div style={{ fontSize: '11px', color: 'var(--cv-text-secondary)', marginBottom: '4px', fontWeight: '600' }}>RESULT</div>
+                                        <div style={{ fontSize: '2em', fontWeight: '800', color: 'var(--cv-accent)', fontFamily: 'monospace' }}>
+                                            {result.result.toFixed(10)}
+                                        </div>
+                                        {result.analytical && (
+                                            <div style={{ marginTop: '8px', padding: '8px', background: 'var(--cv-success-light)', borderRadius: '6px', fontSize: '13px', color: 'var(--cv-success)' }}>
+                                                Analytical: {result.analytical}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
 

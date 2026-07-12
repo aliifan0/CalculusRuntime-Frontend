@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import renderMathInElement from "katex/contrib/auto-render";
 import "katex/dist/katex.min.css";
+import { useProgress } from "../context/ProgressContext";
+import "../pages/Leaderboard.css";
 
 const integrationStyles = `
 .study-guide-page {
@@ -264,25 +266,95 @@ function renderLatex(root) {
   });
 }
 
-function setupMcqs(root) {
+function setupMcqs(root, { publishQuizToLeaderboard, saveQuizScore, setLeaderboardOptIn } = {}) {
   const cards = Array.from(root.querySelectorAll(".mcq-card"));
   if (!cards.length) return [];
 
   const scores = {};
   const totals = {};
+  const answeredCount = {};
   const state = {};
   const answered = {};
   const cleanups = [];
+  const submitHosts = {};
 
   cards.forEach((card) => {
     const section = card.dataset.section;
     totals[section] = (totals[section] || 0) + 1;
     scores[section] = 0;
+    answeredCount[section] = 0;
   });
 
   const updateScoreDisplay = (section) => {
     const el = root.querySelector(`#score${section}`);
     if (el) el.textContent = `${scores[section] || 0} / ${totals[section] || 0}`;
+  };
+
+  const ensureSubmitHost = (section) => {
+    if (submitHosts[section]) return submitHosts[section];
+    const sectionEl =
+      root.querySelector(`.mcq-section[id="mcq${section}"], .mcq-section[data-section="${section}"]`) ||
+      root.querySelector(`#score${section}`)?.closest(".mcq-section") ||
+      cards.find((c) => c.dataset.section === section)?.closest(".mcq-section");
+    if (!sectionEl) return null;
+
+    let host = sectionEl.querySelector(`[data-lb-submit="${section}"]`);
+    if (!host) {
+      host = document.createElement("div");
+      host.dataset.lbSubmit = section;
+      host.className = "lb-submit";
+      host.innerHTML = `
+        <div class="lb-submit__row">
+          <button type="button" class="lb-submit__btn" disabled>Submit to Leaderboard</button>
+          <a class="lb-submit__link" href="/leaderboard">View leaderboard →</a>
+        </div>
+        <p class="lb-submit__hint">Answer every question in this quiz, then submit an anonymized score.</p>
+      `;
+      sectionEl.appendChild(host);
+      const btn = host.querySelector(".lb-submit__btn");
+      const onSubmit = async () => {
+        const score = scores[section] || 0;
+        const total = totals[section] || 0;
+        if (answeredCount[section] < total) return;
+        const quizId = `guide-mcq-${section}`;
+        btn.disabled = true;
+        try {
+          if (publishQuizToLeaderboard) {
+            await publishQuizToLeaderboard(quizId, score, total);
+          } else {
+            await saveQuizScore?.(quizId, score, total);
+            await setLeaderboardOptIn?.(true);
+          }
+          const hint = host.querySelector(".lb-submit__hint, .lb-submit__status");
+          if (hint) {
+            hint.className = "lb-submit__status";
+            hint.textContent = `Submitted ${score}/${total}. You now appear on the leaderboard.`;
+          }
+          btn.textContent = "Update Leaderboard Score";
+        } finally {
+          btn.disabled = false;
+        }
+      };
+      btn?.addEventListener("click", onSubmit);
+      cleanups.push(() => btn?.removeEventListener("click", onSubmit));
+      cleanups.push(() => host.remove());
+    }
+    submitHosts[section] = host;
+    return host;
+  };
+
+  const refreshSubmitVisibility = (section) => {
+    const host = ensureSubmitHost(section);
+    if (!host) return;
+    const btn = host.querySelector(".lb-submit__btn");
+    const done = answeredCount[section] >= (totals[section] || 0);
+    if (btn) btn.disabled = !done;
+    const hint = host.querySelector(".lb-submit__hint");
+    if (hint && !host.querySelector(".lb-submit__status")) {
+      hint.textContent = done
+        ? "Quiz complete — submit your anonymized score to the leaderboard."
+        : "Answer every question in this quiz, then submit an anonymized score.";
+    }
   };
 
   const applyStyles = (card, chosen, correct, revealed) => {
@@ -340,7 +412,9 @@ function setupMcqs(root) {
         scores[section] = (scores[section] || 0) + 1;
       }
 
+      answeredCount[section] = (answeredCount[section] || 0) + 1;
       updateScoreDisplay(section);
+      refreshSubmitVisibility(section);
       if (answerPanel) {
         renderLatex(answerPanel);
       }
@@ -351,6 +425,8 @@ function setupMcqs(root) {
     cleanups.push(() => options?.removeEventListener("click", chooseOption));
     cleanups.push(() => revealButton?.removeEventListener("click", revealAnswer));
     updateScoreDisplay(section);
+    ensureSubmitHost(section);
+    refreshSubmitVisibility(section);
   });
 
   return cleanups;
@@ -358,7 +434,9 @@ function setupMcqs(root) {
 
 function setupSidebar(root) {
   const sections = Array.from(root.querySelectorAll(".section[id], .mcq-section[id]"));
-  const links = Array.from(root.querySelectorAll('.sb-link[href^="#"]'));
+  const links = Array.from(
+    root.querySelectorAll('.sb-link[href^="#"], .sidebar-link[href^="#"], .toc-a[href^="#"], .toc-item-link[href^="#"]'),
+  );
   if (!sections.length || !links.length) return () => {};
 
   const sidebar = root.querySelector(".sidebar");
@@ -417,7 +495,9 @@ function setupSidebar(root) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      const link = root.querySelector(`.sb-link[href="#${entry.target.id}"]`);
+      const link =
+        root.querySelector(`.sb-link[href="#${entry.target.id}"]`) ||
+        root.querySelector(`.sidebar-link[href="#${entry.target.id}"]`);
       if (link && link !== lastActive) {
         links.forEach((item) => item.classList.remove("active"));
         link.classList.add("active");
@@ -432,14 +512,36 @@ function setupSidebar(root) {
   return () => cleanups.forEach((cleanup) => cleanup());
 }
 
-function StudyGuideShell({ guideClass, styles = "", markup, children }) {
+function StudyGuideShell({
+  guideClass = "partial-derivatives-guide",
+  title,
+  styles = "",
+  markup,
+  children,
+}) {
   const rootRef = useRef(null);
+  const { saveQuizScore, setLeaderboardOptIn, publishQuizToLeaderboard } = useProgress();
+  const resolvedClass = guideClass || "partial-derivatives-guide";
+
+  useEffect(() => {
+    if (title) {
+      const previous = document.title;
+      document.title = `${title} · CalcVoyager`;
+      return () => {
+        document.title = previous;
+      };
+    }
+    return undefined;
+  }, [title]);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
 
-    const cleanups = [...setupMcqs(root), setupSidebar(root)];
+    const cleanups = [
+      ...setupMcqs(root, { publishQuizToLeaderboard, saveQuizScore, setLeaderboardOptIn }),
+      setupSidebar(root),
+    ];
     const topButton = root.querySelector("#top-btn");
     const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
     topButton?.addEventListener("click", scrollTop);
@@ -450,10 +552,10 @@ function StudyGuideShell({ guideClass, styles = "", markup, children }) {
     return () => {
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [markup, children]);
+  }, [markup, children, publishQuizToLeaderboard, saveQuizScore, setLeaderboardOptIn]);
 
   return (
-    <main className={`study-guide-page ${guideClass}`}>
+    <main className={`study-guide-page ${resolvedClass}`}>
       <style>{styles + integrationStyles}</style>
       {markup ? (
         <div ref={rootRef} dangerouslySetInnerHTML={{ __html: markup }} />

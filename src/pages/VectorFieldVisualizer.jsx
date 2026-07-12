@@ -186,7 +186,7 @@ const VectorFieldVisualizer = () => {
         } catch (err) {
             setError('Invalid expression: ' + err.message);
         }
-    }, [mode, funcInput, fieldXInput, fieldYInput, gridDensity, xRange, yRange, pointX, pointY, dirAngle, gradient, evalFunc, directionalDerivative, toScreen, drawArrow]);
+    }, [mode, funcInput, fieldXInput, fieldYInput, gridDensity, xRange, pointX, pointY, dirAngle, gradient, evalFunc, directionalDerivative, toScreen, drawArrow]);
 
     useEffect(() => {
         draw();

@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import SubmitToLeaderboard from '../components/SubmitToLeaderboard';
+import './Leaderboard.css';
+import './PractiseSection.css';
 
 // --- MASTER PROBLEM DATABASE (96 DISTINCT PROBLEM OBJECTS) ---
 const PRACTICE_PROBLEMS = [
@@ -608,6 +611,159 @@ const PRACTICE_PROBLEMS = [
     question: 'Find the volume of the solid enclosed by the cylinder x^2 + y^2 = 4, bounded below by the plane z = 0 and above by the paraboloid z = x^2 + y^2.',
     options: ['8π', '4π', '16π', '2π'],
     correctAnswer: 0, explanation: 'In cylindrical coordinates: ∫_0^2π ∫_0^2 (r^2) * r dr dθ = 2π * [1/4 r^4]_0^2 = 2π * 4 = 8π.'
+  },
+
+  // ==========================================
+  // EXTRA DRILL BANK (ids 97–120)
+  // ==========================================
+  {
+    id: 97, topic: 'Lagrange Multipliers', difficulty: 'Easy',
+    question: 'What does the multiplier λ represent geometrically when maximizing f subject to g = c?',
+    options: [
+      'The curvature of the constraint',
+      'How the objective changes relative to a change in the constraint value',
+      'The arc length of the level curve',
+      'The Hessian determinant at the point'
+    ],
+    correctAnswer: 1, explanation: 'λ measures the sensitivity of the optimal value to relaxing the constraint; gradients being parallel encodes that trade-off.'
+  },
+  {
+    id: 98, topic: 'Lagrange Multipliers', difficulty: 'Medium',
+    question: 'Maximize f(x,y) = xy subject to x + y = 6. What is the maximum value?',
+    options: ['6', '9', '12', '18'],
+    correctAnswer: 1, explanation: '∇f = ⟨y,x⟩, ∇g = ⟨1,1⟩ ⇒ y = x = λ and x+y=6 ⇒ x=y=3, so f=9.'
+  },
+  {
+    id: 99, topic: 'Lagrange Multipliers', difficulty: 'Hard',
+    question: 'Minimize f(x,y,z) = x² + y² + z² subject to x + 2y + 2z = 9. What is the minimum?',
+    options: ['1', '3', '9', '81/9'],
+    correctAnswer: 2, explanation: '∇f = 2⟨x,y,z⟩ = λ⟨1,2,2⟩ and the plane constraint give the closest point to the origin; distance squared equals 9.'
+  },
+  {
+    id: 100, topic: 'Divergence & Curl', difficulty: 'Easy',
+    question: 'If F = ⟨x, y, z⟩, then ∇·F equals:',
+    options: ['0', '1', '2', '3'],
+    correctAnswer: 3, explanation: '∂/∂x(x)+∂/∂y(y)+∂/∂z(z) = 1+1+1 = 3.'
+  },
+  {
+    id: 101, topic: 'Divergence & Curl', difficulty: 'Medium',
+    question: 'For F = ⟨-y, x, 0⟩, ∇×F equals:',
+    options: ['⟨0,0,0⟩', '⟨0,0,2⟩', '⟨0,0,1⟩', '⟨2,0,0⟩'],
+    correctAnswer: 1, explanation: 'k-component is ∂Q/∂x − ∂P/∂y = 1 − (−1) = 2.'
+  },
+  {
+    id: 102, topic: 'Divergence & Curl', difficulty: 'Hard',
+    question: 'Which identity is always true (when the fields are smooth)?',
+    options: ['∇×(∇·F) = 0', '∇·(∇×F) = 0', '∇×(∇×F) = 0', '∇·(∇f) = 0'],
+    correctAnswer: 1, explanation: 'The divergence of any curl is identically zero.'
+  },
+  {
+    id: 103, topic: "Stokes' Theorem", difficulty: 'Easy',
+    question: "Stokes' Theorem relates a surface integral of curl F to:",
+    options: ['A volume integral of div F', 'A line integral of F around ∂S', 'A scalar surface integral of |F|', 'The Hessian of F'],
+    correctAnswer: 1, explanation: '∬_S (∇×F)·dS = ∮_∂S F·dr.'
+  },
+  {
+    id: 104, topic: "Stokes' Theorem", difficulty: 'Medium',
+    question: 'If ∇×F = 0 everywhere in a simply connected region, then ∮_C F·dr for a closed curve C is:',
+    options: ['Always positive', 'Always zero', 'Equal to the area enclosed', 'Undefined'],
+    correctAnswer: 1, explanation: 'Irrotational fields are conservative in simply connected domains, so closed-loop circulation vanishes.'
+  },
+  {
+    id: 105, topic: "Stokes' Theorem", difficulty: 'Hard',
+    question: 'For F = ⟨-y, x, z⟩ and S the unit disk in z = 0 oriented upward, ∬_S (∇×F)·dS equals:',
+    options: ['0', 'π', '2π', '1'],
+    correctAnswer: 2, explanation: '∇×F = ⟨0,0,2⟩, so flux through the unit disk is 2·π = 2π (matches ∮ −y dx + x dy).'
+  },
+  {
+    id: 106, topic: 'Taylor Series for Multivariable Functions', difficulty: 'Easy',
+    question: 'The first-order Taylor approximation of f about (a,b) is the:',
+    options: ['Hessian matrix', 'Tangent plane', 'Level curve', 'Gradient flow'],
+    correctAnswer: 1, explanation: 'Linear approximation uses the gradient and is the tangent-plane formula.'
+  },
+  {
+    id: 107, topic: 'Taylor Series for Multivariable Functions', difficulty: 'Medium',
+    question: 'For f(x,y) = e^{x+y} at (0,0), the quadratic term involves which second derivatives?',
+    options: ['Only fₓₓ', 'fₓₓ, fₓy, and f_yy', 'Only mixed partials', 'None — e^{x+y} is already linear'],
+    correctAnswer: 1, explanation: 'All second partials equal e^{x+y}; at (0,0) they equal 1, so the quadratic form uses all three.'
+  },
+  {
+    id: 108, topic: 'Taylor Series for Multivariable Functions', difficulty: 'Hard',
+    question: 'The Maclaurin expansion of cos x through degree 4 is:',
+    options: ['1 + x²/2 + x⁴/24', '1 − x²/2 + x⁴/24', 'x − x³/6', '1 − x + x²/2'],
+    correctAnswer: 1, explanation: 'cos x = 1 − x²/2! + x⁴/4! − … = 1 − x²/2 + x⁴/24 − …'
+  },
+  {
+    id: 109, topic: 'Partial Derivatives', difficulty: 'Easy',
+    question: 'If f(x,y) = x²y, then fₓ equals:',
+    options: ['2xy', 'x²', '2x', 'y'],
+    correctAnswer: 0, explanation: 'Treat y as constant: ∂/∂x(x²y) = 2xy.'
+  },
+  {
+    id: 110, topic: 'Partial Derivatives', difficulty: 'Medium',
+    question: 'Clairaut’s theorem says that if the mixed partials are continuous, then:',
+    options: ['fₓₓ = f_yy', 'fₓy = f_yx', '∇f = 0', 'f is linear'],
+    correctAnswer: 1, explanation: 'Order of differentiation can be swapped for continuous mixed partials.'
+  },
+  {
+    id: 111, topic: 'Partial Derivatives', difficulty: 'Hard',
+    question: 'For f(x,y) = ln(x² + y²), ∇f at (1,1) is:',
+    options: ['⟨1,1⟩', '⟨1/2, 1/2⟩', '⟨2,2⟩', '⟨0,0⟩'],
+    correctAnswer: 1, explanation: 'fₓ = 2x/(x²+y²), f_y = 2y/(x²+y²); at (1,1) both equal 2/2 = 1/2.'
+  },
+  {
+    id: 112, topic: 'Vector Calculus', difficulty: 'Easy',
+    question: 'Green’s Theorem converts a line integral around a simple closed curve into:',
+    options: ['A triple integral', 'A double integral over the enclosed region', 'An arc-length integral only', 'A surface integral in 3D'],
+    correctAnswer: 1, explanation: '∮_C P dx + Q dy = ∬_D (∂Q/∂x − ∂P/∂y) dA.'
+  },
+  {
+    id: 113, topic: 'Vector Calculus', difficulty: 'Medium',
+    question: 'The work of a conservative field F = ∇f from A to B equals:',
+    options: ['f(A) + f(B)', 'f(B) − f(A)', '|f(B)|', '∬ curl f'],
+    correctAnswer: 1, explanation: 'Fundamental theorem for line integrals: ∫_C ∇f·dr = f(B) − f(A).'
+  },
+  {
+    id: 114, topic: 'Vector Calculus', difficulty: 'Hard',
+    question: 'Flux of F = ⟨x,y⟩ outward across the unit circle equals:',
+    options: ['0', '1', 'π', '2π'],
+    correctAnswer: 3, explanation: 'By divergence theorem in 2D (or direct computation), ∮ M dy − N dx = ∬ (1+1) dA = 2·π = 2π.'
+  },
+  {
+    id: 115, topic: 'Limits and Continuity', difficulty: 'Easy',
+    question: 'If lim_{(x,y)→(a,b)} f(x,y) exists and equals f(a,b), then f is:',
+    options: ['Differentiable', 'Continuous at (a,b)', 'Analytic', 'Bounded only'],
+    correctAnswer: 1, explanation: 'That is the definition of continuity at a point.'
+  },
+  {
+    id: 116, topic: 'Limits and Continuity', difficulty: 'Medium',
+    question: 'Along y = mx, lim_{(x,y)→(0,0)} xy/(x²+y²) equals:',
+    options: ['0 for all m', 'm/(1+m²)', '1', 'Does not depend on path'],
+    correctAnswer: 1, explanation: 'Substitute y=mx: m x² / (x²(1+m²)) = m/(1+m²), which depends on m — so the full limit DNE.'
+  },
+  {
+    id: 117, topic: 'Limits and Continuity', difficulty: 'Hard',
+    question: 'lim_{(x,y)→(0,0)} (x²y)/(x⁴+y²) along y = x² equals:',
+    options: ['0', '1/2', '1', 'Does not exist along that path'],
+    correctAnswer: 1, explanation: 'y=x² ⇒ x²(x²)/(x⁴+x⁴) = x⁴/(2x⁴) = 1/2.'
+  },
+  {
+    id: 118, topic: 'Multiple Integrals', difficulty: 'Easy',
+    question: '∬_R 1 dA over a region R computes:',
+    options: ['The perimeter of R', 'The area of R', 'The centroid only', 'Average of x'],
+    correctAnswer: 1, explanation: 'Integrating the constant 1 yields area.'
+  },
+  {
+    id: 119, topic: 'Multiple Integrals', difficulty: 'Medium',
+    question: 'In polar coordinates, dA becomes:',
+    options: ['dr dθ', 'r dr dθ', 'r² dr dθ', 'sinθ dr dθ'],
+    correctAnswer: 1, explanation: 'The Jacobian of x=r cosθ, y=r sinθ is r.'
+  },
+  {
+    id: 120, topic: 'Multiple Integrals', difficulty: 'Hard',
+    question: 'Evaluate ∫_0^1 ∫_0^{1-x} (x+y) dy dx.',
+    options: ['1/6', '1/3', '1/2', '1'],
+    correctAnswer: 0, explanation: 'Inner: [xy + y²/2]_0^{1-x} = x(1-x)+(1-x)²/2; integrate in x to get 1/6.'
   }
 ];
 
@@ -713,43 +869,42 @@ export default function PractiseSection() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 min-h-screen bg-gray-50 text-gray-800">
-      
-      {/* HUD SCOREBOARD PANEL */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white border border-gray-200 shadow-sm rounded-xl p-6 mb-6">
+    <div className="practice-page">
+      <div className="practice-hud">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-gray-900 uppercase">Focused Practice Arena</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Comprehensive testing workspace for Advanced Calculus modules.</p>
+          <h1>Focused Practice Arena</h1>
+          <p>Comprehensive testing workspace for Advanced Calculus modules.</p>
         </div>
-        <div className="mt-4 sm:mt-0 flex items-center bg-indigo-50 border border-indigo-100 px-4 py-2.5 rounded-lg">
-          <div className="text-right mr-4">
-            <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-600">Total Score</span>
-            <div className="text-xl font-black text-indigo-950">{score.correct} <span className="text-gray-400 font-normal">/</span> {score.total}</div>
+        <div className="practice-score">
+          <div>
+            <span className="practice-score-label">Total Score</span>
+            <div className="practice-score-value">
+              {score.correct} <span>/</span> {score.total}
+            </div>
           </div>
-          <button 
+          <button
+            type="button"
+            className="practice-reset"
             onClick={() => setScore({ correct: 0, total: 0 })}
-            className="text-[11px] font-medium bg-white hover:bg-red-50 hover:text-red-600 text-gray-500 border border-gray-200 px-2 py-1 rounded transition"
           >
             Reset
           </button>
         </div>
       </div>
 
-      {/* STEP 1: CHOOSE DIFFICULTY LEVEL */}
       {!chosenDifficulty && (
-        <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm text-center">
-          <h2 className="text-lg font-bold text-gray-950 mb-2">Select Targeted Practice Tier</h2>
-          <p className="text-sm text-gray-500 mb-6">Choose a difficulty tier to unlock the specific topic modules.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {DIFFICULTIES.map(level => (
+        <div className="practice-panel">
+          <h2>Select Targeted Practice Tier</h2>
+          <p style={{ margin: 0, color: 'var(--muted)', fontSize: '0.9rem' }}>
+            Choose a difficulty tier to unlock the specific topic modules.
+          </p>
+          <div className="practice-tier-grid">
+            {DIFFICULTIES.map((level) => (
               <button
                 key={level}
+                type="button"
                 onClick={() => setChosenDifficulty(level)}
-                className={`py-5 px-6 rounded-xl border text-base font-bold transition-all shadow-sm ${
-                  level === 'Easy' ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50 text-emerald-800' :
-                  level === 'Medium' ? 'border-amber-200 bg-amber-50/40 hover:bg-amber-50 text-amber-800' :
-                  'border-rose-200 bg-rose-50/40 hover:bg-rose-50 text-rose-800'
-                }`}
+                className={`practice-tier-btn practice-tier-btn--${level.toLowerCase()}`}
               >
                 {level} Mode
               </button>
@@ -758,27 +913,24 @@ export default function PractiseSection() {
         </div>
       )}
 
-      {/* STEP 2: CHOOSE TOPIC MODULE */}
       {chosenDifficulty && !chosenTopic && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
-            <span className="text-sm font-bold text-gray-500">
-              Difficulty Tier: <span className="text-indigo-600 font-extrabold underline">{chosenDifficulty}</span>
+        <div className="practice-panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>
+            <span className="practice-crumb">
+              Difficulty Tier: <span className="practice-crumb-pill">{chosenDifficulty}</span>
             </span>
-            <button 
-              onClick={handleSelectionReset}
-              className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
-            >
+            <button type="button" className="practice-back" onClick={handleSelectionReset}>
               ← Back to Tiers
             </button>
           </div>
-          <h3 className="text-base font-bold text-gray-900 mb-4">Select Practice Topic:</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {TOPICS.map(topic => (
+          <h3>Select Practice Topic</h3>
+          <div className="practice-topic-grid">
+            {TOPICS.map((topic) => (
               <button
                 key={topic}
+                type="button"
+                className="practice-topic-btn"
                 onClick={() => setChosenTopic(topic)}
-                className="text-left p-4 bg-gray-50 hover:bg-indigo-50 hover:border-indigo-300 border border-gray-200 rounded-lg text-sm font-semibold transition"
               >
                 {topic}
               </button>
@@ -787,109 +939,112 @@ export default function PractiseSection() {
         </div>
       )}
 
-      {/* STEP 3: INTERACTIVE TESTING INTERFACE */}
       {chosenDifficulty && chosenTopic && (
-        <div className="space-y-4">
-          
-          {/* NAVIGATION ACTION BAR */}
-          <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-gray-200 p-3 rounded-lg shadow-sm">
-            <div className="flex items-center space-x-2 text-xs font-bold text-gray-600">
-              <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded">{chosenDifficulty}</span>
-              <span className="text-gray-300">/</span>
-              <span className="text-gray-900">{chosenTopic}</span>
+        <div>
+          <div className="practice-toolbar">
+            <div className="practice-crumb">
+              <span className="practice-crumb-pill">{chosenDifficulty}</span>
+              <span>/</span>
+              <span style={{ color: 'var(--ink)' }}>{chosenTopic}</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="practice-toolbar-actions">
               <button
+                type="button"
+                className="practice-tool-btn practice-tool-btn--accent"
                 onClick={handleTriggerRandom}
                 disabled={poolProblems.length <= 1}
-                className="text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-md disabled:opacity-40 transition"
               >
-                🎲 Randomize Question
+                Randomize Question
               </button>
               <button
+                type="button"
+                className="practice-tool-btn"
                 onClick={handleSelectionReset}
-                className="text-xs font-medium text-gray-500 hover:text-gray-800 border border-gray-200 px-3 py-1.5 rounded-md transition"
               >
                 Change Rules
               </button>
             </div>
           </div>
 
-          {/* MAIN PROBLEM CONTAINER */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="practice-panel">
             {currentProblem ? (
               <div>
-                <div className="text-xs text-gray-400 font-medium mb-2 tracking-wider uppercase">
-                  Question Workspace
-                </div>
-                <h2 className="text-lg font-bold text-gray-900 mb-6 leading-snug">
-                  {currentProblem.question}
-                </h2>
+                <p className="practice-kicker">Question Workspace</p>
+                <h2 className="practice-question">{currentProblem.question}</h2>
 
-                {/* OPTION SELECTIONS */}
-                <div className="space-y-2.5 mb-6">
+                <div className="practice-options" role="listbox" aria-label="Answer choices">
                   {currentProblem.options.map((option, idx) => {
-                    let styleClass = "border-gray-200 bg-white hover:bg-gray-50 text-gray-800";
+                    let stateClass = '';
                     if (selectedAnswer === idx && !isSubmitted) {
-                      styleClass = "border-indigo-600 bg-indigo-50/70 text-indigo-950 ring-2 ring-indigo-600/20";
+                      stateClass = 'practice-option--selected';
                     }
                     if (isSubmitted) {
                       if (idx === currentProblem.correctAnswer) {
-                        styleClass = "border-emerald-500 bg-emerald-50 text-emerald-950 font-semibold";
+                        stateClass = 'practice-option--correct';
                       } else if (selectedAnswer === idx) {
-                        styleClass = "border-rose-500 bg-rose-50 text-rose-950";
+                        stateClass = 'practice-option--wrong';
                       } else {
-                        styleClass = "border-gray-100 text-gray-400 opacity-60";
+                        stateClass = 'practice-option--muted';
                       }
                     }
 
                     return (
                       <button
                         key={idx}
+                        type="button"
+                        role="option"
+                        aria-selected={selectedAnswer === idx}
                         disabled={isSubmitted}
                         onClick={() => handleAnswerClick(idx)}
-                        className={`w-full text-left p-4 rounded-xl border text-sm transition-all flex items-start ${styleClass}`}
+                        className={`practice-option ${stateClass}`.trim()}
                       >
-                        <span className="w-5 h-5 rounded-md bg-gray-100 text-[11px] font-black text-gray-500 flex items-center justify-center border border-gray-200 shrink-0 mr-3 mt-0.5">
+                        <span className="practice-option__letter">
                           {String.fromCharCode(65 + idx)}
                         </span>
-                        <span>{option}</span>
+                        <span className="practice-option__text">{option}</span>
                       </button>
                     );
                   })}
                 </div>
 
-                {/* FOOTER CONTROLS */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="practice-actions">
                   <button
+                    type="button"
+                    className="practice-submit"
                     onClick={handleSubmit}
                     disabled={selectedAnswer === null || isSubmitted}
-                    className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-lg transition shadow-sm"
                   >
                     Submit Verification
                   </button>
 
                   {isSubmitted && (
                     <button
+                      type="button"
+                      className="practice-next"
                       onClick={handleNextInSequence}
-                      className="bg-gray-950 hover:bg-gray-900 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-lg transition shadow-sm"
                     >
                       Next Problem →
                     </button>
                   )}
                 </div>
 
-                {/* EXPLANATION DRIVER BOX */}
                 {isSubmitted && (
-                  <div className="mt-5 bg-emerald-50/50 border border-emerald-100 rounded-xl p-4">
-                    <h4 className="text-xs font-black tracking-wide uppercase text-emerald-800 mb-1">💡 Solution Insight</h4>
-                    <p className="text-xs text-emerald-950 leading-relaxed font-medium">{currentProblem.explanation}</p>
+                  <div className="practice-insight">
+                    <h4>Solution Insight</h4>
+                    <p>{currentProblem.explanation}</p>
                   </div>
                 )}
 
+                {isSubmitted && currentProblem && (
+                  <SubmitToLeaderboard
+                    quizId={`practice-${chosenTopic}-${chosenDifficulty}`}
+                    score={score.correct}
+                    total={Math.max(score.total, 1)}
+                  />
+                )}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-400 text-sm">
+              <div className="practice-empty">
                 No questions populated matching this configuration choice.
               </div>
             )}
