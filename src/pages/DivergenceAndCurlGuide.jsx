@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import StudyGuideShell from "./StudyGuideShell";
 import "./PartialDerivativesGuide.css";
 
@@ -24,78 +25,43 @@ function OpeningNote() {
 
 function GuideSidebarPart1() {
   return (
-    <aside className="guide-sidebar">
-      <div className="sidebar-brand">
-        <span className="brand-icon">∇</span>
-        <div className="brand-text">
-          <h4>Vector Space</h4>
-          <p>Foundations — Part 1</p>
-        </div>
+    <nav className="sidebar">
+      <div className="sb-brand">
+        <div className="sb-sub">Multivariable Calculus</div>
+        <div className="sb-title">Divergence &amp; Curl · Part 1</div>
       </div>
-      <div className="sidebar-menu-wrapper">
-        <div className="sidebar-section-label">Core Lecture Content</div>
-        <ul className="sidebar-links">
-          <li><a href="#s161" className="sidebar-link"><span className="link-num">16.1</span><span className="link-text">Vector Fields Space</span></a></li>
-          <li><a href="#quiz-161" className="sidebar-link quiz-link"><span className="link-num">Q1-3</span><span className="link-text">Quiz Section 16.1</span></a></li>
-          <li><a href="#s162" className="sidebar-link"><span className="link-num">16.2</span><span className="link-text">The Divergence Operator</span></a></li>
-          <li><a href="#quiz-162" className="sidebar-link quiz-link"><span className="link-num">Q4-6</span><span className="link-text">Quiz Section 16.2</span></a></li>
-          <li><a href="#s163" className="sidebar-link"><span className="link-num">16.3</span><span className="link-text">The Curl Operator</span></a></li>
-          <li><a href="#quiz-163" className="sidebar-link quiz-link"><span className="link-num">Q7-9</span><span className="link-text">Quiz Section 16.3</span></a></li>
-        </ul>
-      </div>
-    </aside>
+      <div className="sb-group">Sections</div>
+      <a className="sb-link" href="#s161">Vector Fields</a>
+      <a className="sb-link" href="#quiz-161">Quiz 16.1</a>
+      <a className="sb-link" href="#s162">The Divergence Operator</a>
+      <a className="sb-link" href="#quiz-162">Quiz 16.2</a>
+      <a className="sb-link" href="#s163">The Curl Operator</a>
+      <a className="sb-link" href="#quiz-163">Quiz 16.3</a>
+    </nav>
   );
 }
 
 function GuideHeaderPart1() {
   return (
-    <header className="guide-header">
-      <div className="header-meta">
-        <span className="chapter-tag">Chapter 16 — Vector Calculus</span>
-        <span className="status-badge green">Module 01 Active</span>
-      </div>
-      <h1 className="main-title">Divergence & Curl: Foundations</h1>
-      <p className="header-subtitle">Quantifying Spatial Flux Rates and Local Rotations via the Vector Differential Operator</p>
+    <header className="ch-hdr">
+      <div className="ch-eye">Multivariable Calculus Study Guide · Part 1 of 2</div>
+      <h1 className="ch-title">Divergence &amp; Curl</h1>
+      <p className="ch-sub">Vector Fields, Divergence &amp; Curl Operators</p>
+      <span className="ch-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
     </header>
   );
 }
 
 function TableOfContentsPart1() {
   return (
-    <nav className="toc-box">
-      <div className="toc-head">
-        <h3 className="toc-title">Sections Covered in Part 1</h3>
-        <span className="toc-estimate">Reading Time: 40 Mins</span>
+    <nav className="toc">
+      <div className="toc-h">Contents — Part 1 of 2</div>
+      <div className="toc-grid">
+        <a className="toc-a" href="#s161">Vector Fields</a>
+        <a className="toc-a" href="#s162">The Divergence Operator</a>
+        <a className="toc-a" href="#s163">The Curl Operator</a>
+        <a className="toc-a" href="#quiz-161">Practice Quizzes</a>
       </div>
-      <ol className="toc-list">
-        <li>
-          <a href="#s161" className="toc-item-link">
-            <span className="toc-num-prefix">16.1</span>
-            <div className="toc-link-content">
-              <strong>Conceptual Vector Fields Space</strong>
-              <p>Visualizing how multi-dimensional coordinate fields assign directional force velocities locally across a continuous grid region.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s162" className="toc-item-link">
-            <span className="toc-num-prefix">16.2</span>
-            <div className="toc-link-content">
-              <strong>The Divergence Mathematical Formulation</strong>
-              <p>Deconstructing the dot product differential expression that captures scalar outward expansion rates mapping density sources.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s163" className="toc-item-link">
-            <span className="toc-num-prefix">16.3</span>
-            <div className="toc-link-content">
-              <strong>The Curl Mathematical Formulation</strong>
-              <p>Evaluating determinant cross-product matrices that compute microscopic localized rotation vector axes.</p>
-            </div>
-          </a>
-        </li>
-      </ol>
     </nav>
   );
 }
@@ -340,89 +306,45 @@ function QuizMcq163() {
 
 function GuideSidebarPart2() {
   return (
-    <aside className="guide-sidebar">
-      <div className="sidebar-brand">
-        <span className="brand-icon">∬</span>
-        <div className="brand-text">
-          <h4>Vector Space</h4>
-          <p>Applications — Part 2</p>
-        </div>
+    <nav className="sidebar">
+      <div className="sb-brand">
+        <div className="sb-sub">Multivariable Calculus</div>
+        <div className="sb-title">Divergence &amp; Curl · Part 2</div>
       </div>
-      <div className="sidebar-menu-wrapper">
-        <div className="sidebar-section-label">Application Modules</div>
-        <ul className="sidebar-links">
-          <li><a href="#s164" className="sidebar-link"><span className="link-num">16.4</span><span className="link-text">Physical Mechanics Mapping</span></a></li>
-          <li><a href="#quiz-164" className="sidebar-link quiz-link"><span className="link-num">Q10-12</span><span className="link-text">Quiz Section 16.4</span></a></li>
-          <li><a href="#s165" className="sidebar-link"><span className="link-num">16.5</span><span className="link-text">Core Vector Identities</span></a></li>
-          <li><a href="#quiz-165" className="sidebar-link quiz-link"><span className="link-num">Q13-15</span><span className="link-text">Quiz Section 16.5</span></a></li>
-          <li><a href="#s166" className="sidebar-link"><span className="link-num">16.6</span><span className="link-text">Divergence Theorem Boundary</span></a></li>
-          <li><a href="#quiz-166" className="sidebar-link quiz-link"><span className="link-num">Q16-18</span><span className="link-text">Quiz Section 16.6</span></a></li>
-          <li><a href="#s167" className="sidebar-link"><span className="link-num">16.7</span><span className="link-text">Stokes Conservation Framework</span></a></li>
-          <li><a href="#quiz-167" className="sidebar-link quiz-link"><span className="link-num">Q19-21</span><span className="link-text">Quiz Section 16.7</span></a></li>
-        </ul>
-      </div>
-    </aside>
+      <div className="sb-group">Sections</div>
+      <a className="sb-link" href="#s164">Physical Mechanics Mapping</a>
+      <a className="sb-link" href="#quiz-164">Quiz 16.4</a>
+      <a className="sb-link" href="#s165">Core Vector Identities</a>
+      <a className="sb-link" href="#quiz-165">Quiz 16.5</a>
+      <a className="sb-link" href="#s166">Divergence Theorem</a>
+      <a className="sb-link" href="#quiz-166">Quiz 16.6</a>
+      <a className="sb-link" href="#s167">Stokes Framework</a>
+      <a className="sb-link" href="#quiz-167">Quiz 16.7</a>
+    </nav>
   );
 }
 
 function GuideHeaderPart2() {
   return (
-    <header className="guide-header">
-      <div className="header-meta">
-        <span className="chapter-tag">Chapter 16 — Vector Calculus</span>
-        <span className="status-badge gold">Module 02 Active</span>
-      </div>
-      <h1 className="main-title">Advanced Operator Systems & Integral Fields</h1>
-      <p className="header-subtitle">Evaluating Operational Vector Identities, The Divergence Theorem Fluxes, and Stokes Curvatures</p>
+    <header className="ch-hdr">
+      <div className="ch-eye">Multivariable Calculus Study Guide · Part 2 of 2</div>
+      <h1 className="ch-title">Divergence &amp; Curl</h1>
+      <p className="ch-sub">Identities, Divergence Theorem &amp; Stokes Connections</p>
+      <span className="ch-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
     </header>
   );
 }
 
 function TableOfContentsPart2() {
   return (
-    <nav className="toc-box">
-      <div className="toc-head">
-        <h3 className="toc-title">Sections Covered in Part 2</h3>
-        <span className="toc-estimate">Reading Time: 45 Mins</span>
+    <nav className="toc">
+      <div className="toc-h">Contents — Part 2 of 2</div>
+      <div className="toc-grid">
+        <a className="toc-a" href="#s164">Physical Mechanics Mapping</a>
+        <a className="toc-a" href="#s165">Core Vector Identities</a>
+        <a className="toc-a" href="#s166">Divergence Theorem</a>
+        <a className="toc-a" href="#s167">Stokes Framework</a>
       </div>
-      <ol className="toc-list">
-        <li>
-          <a href="#s164" className="toc-item-link">
-            <span className="toc-num-prefix">16.4</span>
-            <div className="toc-link-content">
-              <strong>Physical Vector Flow Mechanics Mapping</strong>
-              <p>Analyzing compressible fluid expansions and localized rotational vortex properties within physical media streams.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s165" className="toc-item-link">
-            <span className="toc-num-prefix">16.5</span>
-            <div className="toc-link-content">
-              <strong>Core Differential Operator Vector Identities</strong>
-              <p>Proving and tracking properties like the curl of a gradient and the divergence of a curl matrix sequence.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s166" className="toc-item-link">
-            <span className="toc-num-prefix">16.6</span>
-            <div className="toc-link-content">
-              <strong>The Divergence Theorem Spatial Boundary</strong>
-              <p>Converting triple volume source integrals directly into double closed surface area flux boundary calculations.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s167" className="toc-item-link">
-            <span className="toc-num-prefix">16.7</span>
-            <div className="toc-link-content">
-              <strong>Stokes Theorem Circulation Boundary Framework</strong>
-              <p>Translating open surface curl integrations into closed loop line circulation vector pathways.</p>
-            </div>
-          </a>
-        </li>
-      </ol>
     </nav>
   );
 }
@@ -737,7 +659,14 @@ function SectionSummary() {
         <li>{"Construct field mappings using multi-variable components scaled across coordinate bases."}</li>
         <li>{"Simplify outward flux calculations by running divergence dot products with the Del operator."}</li>
         <li>{"Verify rotational micro spin dynamics by evaluating determinant cross-product curl matrices."}</li>
-        <li>{"Bound your total field metrics using Divergence volume and Stokes circulation loop conversion theorems."}</li>
+        <li>
+          {"Bound your total field metrics using Divergence volume and Stokes circulation loop conversion theorems. "}
+          {"For a dedicated walkthrough, open "}
+          <Link to="/stokes-theorem/1" style={{ color: "var(--gold)", fontWeight: 600 }}>
+            {"Stokes' Theorem"}
+          </Link>
+          {"."}
+        </li>
       </ul>
     </section>
   );
@@ -750,65 +679,66 @@ function SectionSummary() {
 function DivergenceAndCurlGuide({ section }) {
   if (section === 2) {
     return (
-      <StudyGuideShell title="Divergence & Curl: Applications (Part 2)">
-        <div className="guide-layout-container">
-          <GuideSidebarPart2 />
-          <div className="guide-content-stream">
-            <GuideHeaderPart2 />
-            <TableOfContentsPart2 />
-            <Divider />
-            <SectionS164 />
-            <QuizMcq164 />
-            <Divider />
-            <SectionS165 />
-            <QuizMcq165 />
-            <Divider />
-            <SectionS166 />
-            <QuizMcq166 />
-            <Divider />
-            <SectionS167 />
-            <QuizMcq167 />
-            <Divider />
-            <SectionSummary />
-          </div>
-        </div>
+      <StudyGuideShell
+        guideClass="partial-derivatives-guide"
+        title="Divergence & Curl: Applications (Part 2)"
+      >
+        <GuideSidebarPart2 />
+        <main className="main">
+          <GuideHeaderPart2 />
+          <TableOfContentsPart2 />
+          <Divider />
+          <SectionS164 />
+          <QuizMcq164 />
+          <Divider />
+          <SectionS165 />
+          <QuizMcq165 />
+          <Divider />
+          <SectionS166 />
+          <QuizMcq166 />
+          <Divider />
+          <SectionS167 />
+          <QuizMcq167 />
+          <Divider />
+          <SectionSummary />
+        </main>
       </StudyGuideShell>
     );
   }
 
-  // Default to Section 1
   return (
-    <StudyGuideShell title="Divergence & Curl: Foundations (Part 1)">
-      <div className="guide-layout-container">
-        <GuideSidebarPart1 />
-        <div className="guide-content-stream">
-          <GuideHeaderPart1 />
-          <TableOfContentsPart1 />
-          <Divider />
-          <OpeningNote />
-          <Divider />
-          <SectionS161 />
-          <QuizMcq161 />
-          <Divider />
-          <SectionS162 />
-          <QuizMcq162 />
-          <Divider />
-          <SectionS163 />
-          <QuizMcq163 />
-          <Divider />
-          <section id="summary1" className="section terminal-link-box">
-            <div className="sec-badge">{"Reference"}</div>
-            <h2 className="sec-title">{"Part 1 Foundations Complete"}</h2>
-            <p>
-              {"Ready to manipulate vector fields? Move to "}
-              <a href="/divergence-curl/2" style={{ color: "var(--gold)", fontWeight: 600 }}>
-                {"Part 2: Applications & Integral Theorems"}
-              </a>
-              {" to study second-order identities, the Divergence Theorem flux bounds, and Stokes surface circulation workflows."}
-            </p>
-          </section>
-        </div>
-      </div>
+    <StudyGuideShell
+      guideClass="partial-derivatives-guide"
+      title="Divergence & Curl: Foundations (Part 1)"
+    >
+      <GuideSidebarPart1 />
+      <main className="main">
+        <GuideHeaderPart1 />
+        <TableOfContentsPart1 />
+        <Divider />
+        <OpeningNote />
+        <Divider />
+        <SectionS161 />
+        <QuizMcq161 />
+        <Divider />
+        <SectionS162 />
+        <QuizMcq162 />
+        <Divider />
+        <SectionS163 />
+        <QuizMcq163 />
+        <Divider />
+        <section id="summary1" className="section">
+          <div className="sec-badge">{"Reference"}</div>
+          <h2 className="sec-title">{"Part 1 Foundations Complete"}</h2>
+          <p>
+            {"Continue to "}
+            <Link to="/divergence-curl/2" style={{ color: "var(--gold)", fontWeight: 600 }}>
+              {"Part 2: Applications & Integral Theorems"}
+            </Link>
+            {"."}
+          </p>
+        </section>
+      </main>
     </StudyGuideShell>
   );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import StudyGuideShell from "./StudyGuideShell";
 import "./PartialDerivativesGuide.css";
 
@@ -22,78 +23,43 @@ function OpeningNote() {
 
 function GuideSidebarPart1() {
   return (
-    <aside className="guide-sidebar">
-      <div className="sidebar-brand">
-        <span className="brand-icon">∑</span>
-        <div className="brand-text">
-          <h4>Taylor Space</h4>
-          <p>Foundations — Part 1</p>
-        </div>
+    <nav className="sidebar">
+      <div className="sb-brand">
+        <div className="sb-sub">Multivariable Calculus</div>
+        <div className="sb-title">Taylor Series · Part 1</div>
       </div>
-      <div className="sidebar-menu-wrapper">
-        <div className="sidebar-section-label">Core Lecture Content</div>
-        <ul className="sidebar-links">
-          <li><a href="#s171" className="sidebar-link"><span className="link-num">17.1</span><span className="link-text">Polynomial Approximation</span></a></li>
-          <li><a href="#quiz-171" className="sidebar-link quiz-link"><span className="link-num">Q1-3</span><span className="link-text">Quiz Section 17.1</span></a></li>
-          <li><a href="#s172" className="sidebar-link"><span className="link-num">17.2</span><span className="link-text">The Taylor Formula</span></a></li>
-          <li><a href="#quiz-172" className="sidebar-link quiz-link"><span className="link-num">Q4-6</span><span className="link-text">Quiz Section 17.2</span></a></li>
-          <li><a href="#s173" className="sidebar-link"><span className="link-num">17.3</span><span className="link-text">Maclaurin Reductions</span></a></li>
-          <li><a href="#quiz-173" className="sidebar-link quiz-link"><span className="link-num">Q7-9</span><span className="link-text">Quiz Section 17.3</span></a></li>
-        </ul>
-      </div>
-    </aside>
+      <div className="sb-group">Sections</div>
+      <a className="sb-link" href="#s171">Polynomial Approximation</a>
+      <a className="sb-link" href="#quiz-171">Quiz 17.1</a>
+      <a className="sb-link" href="#s172">The Taylor Formula</a>
+      <a className="sb-link" href="#quiz-172">Quiz 17.2</a>
+      <a className="sb-link" href="#s173">Maclaurin Reductions</a>
+      <a className="sb-link" href="#quiz-173">Quiz 17.3</a>
+    </nav>
   );
 }
 
 function GuideHeaderPart1() {
   return (
-    <header className="guide-header">
-      <div className="header-meta">
-        <span className="chapter-tag">Chapter 17 — Infinite Series</span>
-        <span className="status-badge green">Module 01 Active</span>
-      </div>
-      <h1 className="main-title">Taylor Series: Foundations</h1>
-      <p className="header-subtitle">Constructing Polynomial Approximations via Higher-Order Derivatives</p>
+    <header className="ch-hdr">
+      <div className="ch-eye">Multivariable Calculus Study Guide · Part 1 of 2</div>
+      <h1 className="ch-title">Taylor Series</h1>
+      <p className="ch-sub">Polynomial Approximations, The Taylor Formula &amp; Maclaurin Series</p>
+      <span className="ch-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
     </header>
   );
 }
 
 function TableOfContentsPart1() {
   return (
-    <nav className="toc-box">
-      <div className="toc-head">
-        <h3 className="toc-title">Sections Covered in Part 1</h3>
-        <span className="toc-estimate">Reading Time: 40 Mins</span>
+    <nav className="toc">
+      <div className="toc-h">Contents — Part 1 of 2</div>
+      <div className="toc-grid">
+        <a className="toc-a" href="#s171">Polynomial Approximation</a>
+        <a className="toc-a" href="#s172">The Taylor Formula</a>
+        <a className="toc-a" href="#s173">Maclaurin Reductions</a>
+        <a className="toc-a" href="#quiz-171">Practice Quizzes</a>
       </div>
-      <ol className="toc-list">
-        <li>
-          <a href="#s171" className="toc-item-link">
-            <span className="toc-num-prefix">17.1</span>
-            <div className="toc-link-content">
-              <strong>Conceptual Polynomial Approximation Space</strong>
-              <p>Visualizing how matching derivative curves locks a polynomial shape to a complex function line locally.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s172" className="toc-item-link">
-            <span className="toc-num-prefix">17.2</span>
-            <div className="toc-link-content">
-              <strong>The General Taylor Series Mathematical Formulation</strong>
-              <p>Deconstructing the definitive general expression weighted by factorials and power differences.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s173" className="toc-item-link">
-            <span className="toc-num-prefix">17.3</span>
-            <div className="toc-link-content">
-              <strong>Maclaurin Special Case Reductions</strong>
-              <p>Evaluating sequences centered precisely at the coordinate origin ($a = 0$).</p>
-            </div>
-          </a>
-        </li>
-      </ol>
     </nav>
   );
 }
@@ -332,89 +298,45 @@ function QuizMcq173() {
 
 function GuideSidebarPart2() {
   return (
-    <aside className="guide-sidebar">
-      <div className="sidebar-brand">
-        <span className="brand-icon">Δx</span>
-        <div className="brand-text">
-          <h4>Taylor Space</h4>
-          <p>Applications — Part 2</p>
-        </div>
+    <nav className="sidebar">
+      <div className="sb-brand">
+        <div className="sb-sub">Multivariable Calculus</div>
+        <div className="sb-title">Taylor Series · Part 2</div>
       </div>
-      <div className="sidebar-menu-wrapper">
-        <div className="sidebar-section-label">Application Modules</div>
-        <ul className="sidebar-links">
-          <li><a href="#s174" className="sidebar-link"><span className="link-num">17.4</span><span className="link-text">Common Maclaurin Expansion</span></a></li>
-          <li><a href="#quiz-174" className="sidebar-link quiz-link"><span className="link-num">Q10-12</span><span className="link-text">Quiz Section 17.4</span></a></li>
-          <li><a href="#s175" className="sidebar-link"><span className="link-num">17.5</span><span className="link-text">Radius of Convergence</span></a></li>
-          <li><a href="#quiz-175" className="sidebar-link quiz-link"><span className="link-num">Q13-15</span><span className="link-text">Quiz Section 17.5</span></a></li>
-          <li><a href="#s176" className="sidebar-link"><span className="link-num">17.6</span><span className="link-text">Taylor Error Estimation</span></a></li>
-          <li><a href="#quiz-176" className="sidebar-link quiz-link"><span className="link-num">Q16-18</span><span className="link-text">Quiz Section 17.6</span></a></li>
-          <li><a href="#s177" className="sidebar-link"><span className="link-num">17.7</span><span className="link-text">Engineering Computations</span></a></li>
-          <li><a href="#quiz-177" className="sidebar-link quiz-link"><span className="link-num">Q19-21</span><span className="link-text">Quiz Section 17.7</span></a></li>
-        </ul>
-      </div>
-    </aside>
+      <div className="sb-group">Sections</div>
+      <a className="sb-link" href="#s174">Common Maclaurin Expansions</a>
+      <a className="sb-link" href="#quiz-174">Quiz 17.4</a>
+      <a className="sb-link" href="#s175">Radius of Convergence</a>
+      <a className="sb-link" href="#quiz-175">Quiz 17.5</a>
+      <a className="sb-link" href="#s176">Taylor Error Estimation</a>
+      <a className="sb-link" href="#quiz-176">Quiz 17.6</a>
+      <a className="sb-link" href="#s177">Engineering Computations</a>
+      <a className="sb-link" href="#quiz-177">Quiz 17.7</a>
+    </nav>
   );
 }
 
 function GuideHeaderPart2() {
   return (
-    <header className="guide-header">
-      <div className="header-meta">
-        <span className="chapter-tag">Chapter 17 — Infinite Series</span>
-        <span className="status-badge gold">Module 02 Active</span>
-      </div>
-      <h1 className="main-title">Advanced Applications & Error Bounders</h1>
-      <p className="header-subtitle">Evaluating Convergence Limits, Remainder Errors, and Engineering Approximations</p>
+    <header className="ch-hdr">
+      <div className="ch-eye">Multivariable Calculus Study Guide · Part 2 of 2</div>
+      <h1 className="ch-title">Taylor Series</h1>
+      <p className="ch-sub">Convergence, Error Bounds &amp; Engineering Applications</p>
+      <span className="ch-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
     </header>
   );
 }
 
 function TableOfContentsPart2() {
   return (
-    <nav className="toc-box">
-      <div className="toc-head">
-        <h3 className="toc-title">Sections Covered in Part 2</h3>
-        <span className="toc-estimate">Reading Time: 45 Mins</span>
+    <nav className="toc">
+      <div className="toc-h">Contents — Part 2 of 2</div>
+      <div className="toc-grid">
+        <a className="toc-a" href="#s174">Common Maclaurin Expansions</a>
+        <a className="toc-a" href="#s175">Radius of Convergence</a>
+        <a className="toc-a" href="#s176">Taylor Error Estimation</a>
+        <a className="toc-a" href="#s177">Engineering Computations</a>
       </div>
-      <ol className="toc-list">
-        <li>
-          <a href="#s174" className="toc-item-link">
-            <span className="toc-num-prefix">17.4</span>
-            <div className="toc-link-content">
-              <strong>Common Transcendental Maclaurin Expansions</strong>
-              <p>Memorizing and manipulating the standard infinite series patterns for $e^x$, $\\sin(x)$, and $\\cos(x)$.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s175" className="toc-item-link">
-            <span className="toc-num-prefix">17.5</span>
-            <div className="toc-link-content">
-              <strong>Radius & Intervals of Convergence Boundaries</strong>
-              <p>Applying the Ratio Test to map out the exact coordinate windows where your polynomial remains valid.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s176" className="toc-item-link">
-            <span className="toc-num-prefix">17.6</span>
-            <div className="toc-link-content">
-              <strong>Taylor's Inequality & Remainder Error Bounds</strong>
-              <p>Using Lagrange remainder formulas to calculate the exact maximum error margin when cutting off your polynomial terms early.</p>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="#s177" className="toc-item-link">
-            <span className="toc-num-prefix">17.7</span>
-            <div className="toc-link-content">
-              <strong>Applied Computational Engineering Workflows</strong>
-              <p>Leveraging small-angle approximations and evaluating non-elementary integrals in physical contexts.</p>
-            </div>
-          </a>
-        </li>
-      </ol>
     </nav>
   );
 }
@@ -578,7 +500,7 @@ function SectionS176() {
       <h2 className="sec-title">{"Taylor's Inequality & Remainder Error Bounds"}</h2>
       <p>
         {"In practical applications, we can't sum infinite terms; we have to truncate (cut off) the polynomial at a certain degree $n$. The leftover part is the remainder error, $R_n(x) = f(x) - P_n(x)$. We use Taylor's Inequality to find the exact maximum upper bound of this error margin:"}
-        {"$$\left| R_n(x) \\right| \\leq \\frac{M}{(n+1)!} \\left| x - a \\right|^{n+1}$$"}
+        {"$$\\left| R_n(x) \\right| \\leq \\frac{M}{(n+1)!} \\left| x - a \\right|^{n+1}$$"}
         {"Here, $M$ represents the maximum absolute value achieved by the $(n+1)$-th derivative within the tracking region range."}
       </p>
     </section>
@@ -736,64 +658,66 @@ function SectionSummary() {
 function TaylorSeriesGuide({ section }) {
   if (section === 2) {
     return (
-      <StudyGuideShell title="Taylor Series: Applications (Part 2)">
-        <div className="guide-layout-container">
-          <GuideSidebarPart2 />
-          <div className="guide-content-stream">
-            <GuideHeaderPart2 />
-            <TableOfContentsPart2 />
-            <Divider />
-            <SectionS174 />
-            <QuizMcq174 />
-            <Divider />
-            <SectionS175 />
-            <QuizMcq175 />
-            <Divider />
-            <SectionS176 />
-            <QuizMcq176 />
-            <Divider />
-            <SectionS177 />
-            <QuizMcq177 />
-            <Divider />
-            <SectionSummary />
-          </div>
-        </div>
+      <StudyGuideShell
+        guideClass="partial-derivatives-guide"
+        title="Taylor Series: Applications (Part 2)"
+      >
+        <GuideSidebarPart2 />
+        <main className="main">
+          <GuideHeaderPart2 />
+          <TableOfContentsPart2 />
+          <Divider />
+          <SectionS174 />
+          <QuizMcq174 />
+          <Divider />
+          <SectionS175 />
+          <QuizMcq175 />
+          <Divider />
+          <SectionS176 />
+          <QuizMcq176 />
+          <Divider />
+          <SectionS177 />
+          <QuizMcq177 />
+          <Divider />
+          <SectionSummary />
+        </main>
       </StudyGuideShell>
     );
   }
 
   return (
-    <StudyGuideShell title="Taylor Series: Foundations (Part 1)">
-      <div className="guide-layout-container">
-        <GuideSidebarPart1 />
-        <div className="guide-content-stream">
-          <GuideHeaderPart1 />
-          <TableOfContentsPart1 />
-          <Divider />
-          <OpeningNote />
-          <Divider />
-          <SectionS171 />
-          <QuizMcq171 />
-          <Divider />
-          <SectionS172 />
-          <QuizMcq172 />
-          <Divider />
-          <SectionS173 />
-          <QuizMcq173 />
-          <Divider />
-          <section id="summary1" className="section terminal-link-box">
-            <div className="sec-badge">{"Reference"}</div>
-            <h2 className="sec-title">{"Part 1 Foundations Complete"}</h2>
-            <p>
-              {"Ready to manipulate infinite polynomials? Move to "}
-              <a href="/taylor-series/2" style={{ color: "var(--gold)", fontWeight: 600 }}>
-                {"Part 2: Applications & Error Estimators"}
-              </a>
-              {" to study convergence testing intervals, Lagrange error bounds, and engineering substitution workflows."}
-            </p>
-          </section>
-        </div>
-      </div>
+    <StudyGuideShell
+      guideClass="partial-derivatives-guide"
+      title="Taylor Series: Foundations (Part 1)"
+    >
+      <GuideSidebarPart1 />
+      <main className="main">
+        <GuideHeaderPart1 />
+        <TableOfContentsPart1 />
+        <Divider />
+        <OpeningNote />
+        <Divider />
+        <SectionS171 />
+        <QuizMcq171 />
+        <Divider />
+        <SectionS172 />
+        <QuizMcq172 />
+        <Divider />
+        <SectionS173 />
+        <QuizMcq173 />
+        <Divider />
+        <section id="summary1" className="section">
+          <div className="sec-badge">{"Reference"}</div>
+          <h2 className="sec-title">{"Part 1 Foundations Complete"}</h2>
+          <p>
+            {"Continue to "}
+            <Link to="/taylor-series/2" style={{ color: "var(--gold)", fontWeight: 600 }}>
+              {"Part 2: Convergence, Error Bounds & Applications"}
+            </Link>
+            {"."}
+          </p>
+        </section>
+      </main>
     </StudyGuideShell>
   );
 }

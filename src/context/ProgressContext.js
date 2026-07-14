@@ -20,18 +20,41 @@ function loadProgress(username) {
 
 function defaultProgress() {
   return {
-    completedSections: {},   // { "partial-1": true, "vector-1": true }
+    completedSections: {},
     completedSectionTimestamps: {},
     completedSectionMetadata: {},
-    quizScores: {},          // { "partial-1-mcq141": { score: 2, total: 3 } }
-    bookmarks: [],           // [{ id, title, path, addedAt }]
-    solverHistory: [],       // [{ input, result, timestamp }]
-    lastVisited: {},         // { "partial-derivatives": timestamp }
+    quizScores: {},
+    bookmarks: [],
+    solverHistory: [],
+    lastVisited: {},
+    leaderboardOptIn: false,
   };
 }
 
+function mergeQuizScores(localScores = {}, serverScores = {}) {
+  const merged = { ...localScores };
+  for (const [quizId, server] of Object.entries(serverScores || {})) {
+    const local = merged[quizId];
+    if (!local) {
+      merged[quizId] = { score: server.score, total: server.total };
+      continue;
+    }
+    const localScore = Number(local.score) || 0;
+    const serverScore = Number(server.score) || 0;
+    if (serverScore > localScore) {
+      merged[quizId] = { score: server.score, total: server.total };
+    } else if (serverScore === localScore && server.total) {
+      merged[quizId] = {
+        score: local.score,
+        total: server.total || local.total,
+      };
+    }
+  }
+  return merged;
+}
+
 function normalizeProgressPayload(payload) {
-  return {
+  const next = {
     completedSections: payload?.completedSections || {},
     completedSectionTimestamps: payload?.completedSectionTimestamps || {},
     completedSectionMetadata: payload?.completedSectionMetadata || {},
@@ -41,6 +64,10 @@ function normalizeProgressPayload(payload) {
     lastVisited: payload?.lastVisited || {},
     solverUses: payload?.solverUses ?? 0,
   };
+  if (payload && Object.prototype.hasOwnProperty.call(payload, "leaderboardOptIn")) {
+    next.leaderboardOptIn = Boolean(payload.leaderboardOptIn);
+  }
+  return next;
 }
 
 export function ProgressProvider({ children }) {
@@ -48,7 +75,6 @@ export function ProgressProvider({ children }) {
   const [progress, setProgress] = useState(() => loadProgress(user?.username));
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Reload when user changes
   useEffect(() => {
     setProgress(loadProgress(user?.username));
     setIsHydrated(false);
@@ -63,6 +89,14 @@ export function ProgressProvider({ children }) {
     },
     [user?.username]
   );
+
+  const authHeaders = useCallback(() => {
+    if (!user?.accessToken) return null;
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+  }, [user?.accessToken]);
 
   useEffect(() => {
     if (!user?.accessToken) {
@@ -85,19 +119,41 @@ export function ProgressProvider({ children }) {
         }
 
         const payload = await response.json();
+        if (cancelled) return;
+
+        setProgress((prev) => {
+          const server = normalizeProgressPayload(payload);
+          const next = {
+            ...prev,
+            ...server,
+            // Never wipe local quiz scores that haven't synced yet.
+            quizScores: mergeQuizScores(prev.quizScores, server.quizScores),
+            // Keep local opt-in if the API omitted the field.
+            leaderboardOptIn:
+              server.leaderboardOptIn !== undefined
+                ? server.leaderboardOptIn
+                : Boolean(prev.leaderboardOptIn),
+            // Preserve client-only fields the API snapshot may omit.
+            solverHistory: prev.solverHistory?.length
+              ? prev.solverHistory
+              : server.solverHistory || [],
+            lastVisited: {
+              ...(server.lastVisited || {}),
+              ...(prev.lastVisited || {}),
+            },
+            bookmarks: (server.bookmarks && server.bookmarks.length > 0)
+              ? server.bookmarks
+              : prev.bookmarks,
+          };
+          persist(next);
+          return next;
+        });
+      } catch {
         if (!cancelled) {
           setProgress((prev) => ({
             ...prev,
-            ...normalizeProgressPayload(payload),
+            completedSectionTimestamps: prev.completedSectionTimestamps || {},
           }));
-          persist({
-            ...defaultProgress(),
-            ...normalizeProgressPayload(payload),
-          });
-        }
-      } catch {
-        if (!cancelled) {
-          setProgress((prev) => ({ ...prev, completedSectionTimestamps: prev.completedSectionTimestamps || {} }));
         }
       } finally {
         if (!cancelled) {
@@ -114,66 +170,67 @@ export function ProgressProvider({ children }) {
 
   const markSectionComplete = useCallback(
     async (sectionId) => {
-      if (!user?.accessToken) {
+      const applyLocal = (completedAt = Date.now()) => {
         setProgress((prev) => {
           const next = {
             ...prev,
             completedSections: { ...prev.completedSections, [sectionId]: true },
             completedSectionTimestamps: {
               ...prev.completedSectionTimestamps,
-              [sectionId]: Date.now(),
+              [sectionId]: completedAt,
+            },
+            completedSectionMetadata: {
+              ...prev.completedSectionMetadata,
+              [sectionId]: {
+                needs_review: false,
+                days_since_completion: 0,
+              },
             },
           };
           persist(next);
           return next;
         });
-        return;
-      }
+      };
 
-      const response = await fetch(`${API_URL}/api/progress/section/complete`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.accessToken}`,
-        },
-        body: JSON.stringify({ section_id: sectionId }),
-      });
+      // Always update local UI first so the button never crashes the page.
+      applyLocal();
 
-      if (!response.ok) {
-        throw new Error("Could not mark section complete");
-      }
+      if (!user?.accessToken) return;
 
-      const payload = await response.json();
-      const completedAt = payload.completed_at ?? Date.now();
-      setProgress((prev) => {
-        const next = {
-          ...prev,
-          completedSections: { ...prev.completedSections, [sectionId]: true },
-          completedSectionTimestamps: {
-            ...prev.completedSectionTimestamps,
-            [sectionId]: completedAt,
+      try {
+        const response = await fetch(`${API_URL}/api/progress/section/complete`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.accessToken}`,
           },
-          completedSectionMetadata: {
-            ...prev.completedSectionMetadata,
-            [sectionId]: {
-              needs_review: false,
-              days_since_completion: 0,
-            },
-          },
-        };
-        persist(next);
-        return next;
-      });
+          body: JSON.stringify({ section_id: sectionId }),
+        });
+
+        if (!response.ok) {
+          // Local mark already applied; stale sessions just stay local.
+          return;
+        }
+
+        const payload = await response.json().catch(() => ({}));
+        if (payload?.completed_at != null) {
+          applyLocal(payload.completed_at);
+        }
+      } catch {
+        // Network / CORS / backend down — local progress already saved.
+      }
     },
     [persist, user?.accessToken]
   );
 
   const saveQuizScore = useCallback(
-    (quizId, score, total) => {
+    async (quizId, score, total) => {
       setProgress((prev) => {
         const existing = prev.quizScores[quizId];
-        // Only update if new score is better
-        if (existing && existing.score >= score) return prev;
+        // Keep the best local score, but still sync this attempt to the API below.
+        if (existing && existing.score >= score) {
+          return prev;
+        }
         const next = {
           ...prev,
           quizScores: { ...prev.quizScores, [quizId]: { score, total } },
@@ -181,8 +238,21 @@ export function ProgressProvider({ children }) {
         persist(next);
         return next;
       });
+
+      const headers = authHeaders();
+      if (!headers) return;
+
+      try {
+        await fetch(`${API_URL}/api/quiz/`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ quiz_id: quizId, score, total }),
+        });
+      } catch {
+        // Local score is already saved; sync can retry on next submit.
+      }
     },
-    [persist]
+    [authHeaders, persist]
   );
 
   const addBookmark = useCallback(
@@ -247,9 +317,77 @@ export function ProgressProvider({ children }) {
     [persist]
   );
 
-  // Compute overall stats
+  const setLeaderboardOptIn = useCallback(
+    async (optIn) => {
+      const value = Boolean(optIn);
+      setProgress((prev) => {
+        const next = {
+          ...prev,
+          leaderboardOptIn: value,
+        };
+        persist(next);
+        return next;
+      });
+
+      const headers = authHeaders();
+      if (!headers) return;
+
+      try {
+        await fetch(`${API_URL}/api/progress/leaderboard`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ opt_in: value }),
+        });
+      } catch {
+        // Opt-in remains local until the backend accepts it.
+      }
+    },
+    [authHeaders, persist]
+  );
+
+  /** Atomically save a quiz score and opt into the leaderboard (avoids setState races). */
+  const publishQuizToLeaderboard = useCallback(
+    async (quizId, score, total) => {
+      setProgress((prev) => {
+        const existing = prev.quizScores[quizId];
+        const quizScores =
+          !existing || existing.score < score
+            ? { ...prev.quizScores, [quizId]: { score, total } }
+            : prev.quizScores;
+        const next = {
+          ...prev,
+          quizScores,
+          leaderboardOptIn: true,
+        };
+        persist(next);
+        return next;
+      });
+
+      const headers = authHeaders();
+      if (!headers) return;
+
+      try {
+        await Promise.all([
+          fetch(`${API_URL}/api/quiz/`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ quiz_id: quizId, score, total }),
+          }),
+          fetch(`${API_URL}/api/progress/leaderboard`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ opt_in: true }),
+          }),
+        ]);
+      } catch {
+        // Local progress already updated.
+      }
+    },
+    [authHeaders, persist]
+  );
+
   const stats = {
-    totalSections: 12, // 7 partial + 5 vector
+    totalSections: 12,
     completedCount: Object.keys(progress.completedSections).length,
     bookmarkCount: progress.bookmarks.length,
     quizzesTaken: Object.keys(progress.quizScores).length,
@@ -268,6 +406,8 @@ export function ProgressProvider({ children }) {
         isBookmarked,
         addSolverHistory,
         recordVisit,
+        setLeaderboardOptIn,
+        publishQuizToLeaderboard,
         isHydrated,
       }}
     >

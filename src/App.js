@@ -11,6 +11,9 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AISolver from "./pages/AISolver";
 import NotFound from "./pages/NotFound";
+import CourseHub from "./pages/CourseHub";
+import SimpleConcepts from "./pages/SimpleConcepts";
+import ConceptExplore from "./pages/ConceptExplore";
 
 import IntegralsPart1 from "./pages/IntegralsPart1";
 import IntegralsPart2 from "./pages/IntegralsPart2";
@@ -36,6 +39,7 @@ import VolumeCalculator from "./pages/VolumeCalculator";
 import DerivativeTool from "./components/DerivativeTool";
 import VectorFieldVisualizer from "./pages/VectorFieldVisualizer";
 import CheatSheet from "./pages/CheatSheet";
+import Leaderboard from "./pages/Leaderboard";
 
 function App() {
   return (
@@ -52,6 +56,13 @@ function App() {
               <Route path="/login"     element={<Login />} />
               <Route path="/signup"    element={<Signup />} />
               <Route path="/dashboard" element={<Layout body={<Dashboard />} />} />
+
+              {/* Course hubs (Choose a path) */}
+              <Route path="/courses/:courseId" element={<Layout body={<CourseHub />} />} />
+
+              {/* Simple Concepts */}
+              <Route path="/simple-concepts" element={<Layout body={<SimpleConcepts />} />} />
+              <Route path="/simple-concepts/:slug" element={<Layout body={<ConceptExplore />} />} />
 
               {/* AI Solver */}
               <Route path="/ai-solver" element={<Layout body={<AISolver />} />} />
@@ -110,6 +121,9 @@ function App() {
 
               {/* AI Personalized Study Plan */}
               <Route path="/study-plan" element={<Layout body={<PersonalizedStudyPlan />} />} />
+
+              {/* Objective 14 — Opt-in peer leaderboard */}
+              <Route path="/leaderboard" element={<Layout body={<Leaderboard />} />} />
 
               {/* Catch-all */}
               <Route path="*" element={<Layout body={<NotFound />} />} />

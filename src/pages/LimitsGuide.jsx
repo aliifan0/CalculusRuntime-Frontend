@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useProgress } from "../context/ProgressContext";
+import SubmitToLeaderboard from "../components/SubmitToLeaderboard";
 import StudyGuideShell from "./StudyGuideShell";
 import "./PartialDerivativesGuide.css";
 
@@ -334,6 +335,11 @@ function LimitsQuiz({ part }) {
         <div className="quiz-result">
           <p>{"Score: "}<strong>{score + " / " + questions.length}</strong></p>
           <button className="quiz-retry" onClick={handleReset}>{"Try again"}</button>
+          <SubmitToLeaderboard
+            quizId={quizId}
+            score={score}
+            total={questions.length}
+          />
         </div>
       )}
     </section>

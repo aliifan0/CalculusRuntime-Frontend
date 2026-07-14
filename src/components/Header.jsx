@@ -1,30 +1,33 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const navLinks = [
 
-  { to: "/simple-concepts",        label: "Concepts",    type: "Guide"     },
-  { to: "/partial-derivatives/1",  label: "Partials",    type: "Guide"     },
-  { to: "/vector-calculus/1",      label: "Vectors",     type: "Guide"     },
-  { to: "/multiple-integrals/1",   label: "Integrals",   type: "Guide"     },
-  { to: "/lagrange-multipliers/1", label: "Lagrange",    type: "Guide"     },
-  { to: "/stokes-theorem/1",       label: "Stokes",      type: "Guide"     },
-  { to: "/divergence-curl/1",      label: "Divergence",  type: "Guide"     },
+  { to: "/simple-concepts",        label: "Concepts",    type: "Guide",     match: "/simple-concepts" },
+  { to: "/partial-derivatives/1",  label: "Partials",    type: "Guide",     match: "/partial-derivatives" },
+  { to: "/vector-calculus/1",      label: "Vectors",     type: "Guide",     match: "/vector-calculus" },
+  { to: "/multiple-integrals/1",   label: "Integrals",   type: "Guide",     match: "/multiple-integrals" },
+  { to: "/taylor-series/1",        label: "Taylor",      type: "Guide",     match: "/taylor-series" },
+  { to: "/lagrange-multipliers/1", label: "Lagrange",    type: "Guide",     match: "/lagrange-multipliers" },
+  { to: "/stokes-theorem/1",       label: "Stokes",      type: "Guide",     match: "/stokes-theorem" },
+  { to: "/divergence-curl/1",      label: "Divergence",  type: "Guide",     match: "/divergence-curl" },
 
-  { to: "/test",                   label: "Continuity",  type: "Tool"      },
-  { to: "/extreme",                label: "Extrema",     type: "Tool"      },
-  { to: "/volumecalculator",       label: "Volume Calc", type: "Tool"      },
-  { to: "/taylorx",                label: "TaylorX",     type: "Tool"      },
-  { to: "/ai-solver",              label: "AI Solver",   type: "Tool"      },
-  { to: "/cheatsheet",             label: "Cheat Sheet", type: "Tool"      },
+  { to: "/test",                   label: "Continuity",  type: "Tool" },
+  { to: "/extreme",                label: "Extrema",     type: "Tool" },
+  { to: "/volumecalculator",       label: "Volume Calc", type: "Tool" },
+  { to: "/taylorx",                label: "TaylorX",     type: "Tool" },
+  { to: "/ai-solver",              label: "AI Solver",   type: "Tool" },
+  { to: "/cheatsheet",             label: "Cheat Sheet", type: "Tool" },
 
   
   { to: "/practice",               label: "Practice",    type: "Workspace" },
+  { to: "/leaderboard",            label: "Leaderboard", type: "Workspace" },
 ];
 
 function Header({ darkMode, onToggleDark }) {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef(null);
 
@@ -68,11 +71,22 @@ function Header({ darkMode, onToggleDark }) {
 
       {/* Desktop nav */}
       <nav className="site-nav" aria-label="Primary navigation">
-        {navLinks.map(({ to, label, type }) => (
-          <NavLink key={to} to={to} title={type}>
-            <span>{label}</span>
-          </NavLink>
-        ))}
+        {navLinks.map(({ to, label, type, match }) => {
+          const active = match
+            ? location.pathname.startsWith(match)
+            : location.pathname === to;
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              title={type}
+              className={active ? "active" : undefined}
+              aria-current={active ? "page" : undefined}
+            >
+              <span>{label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
 
       {/* Controls: theme toggle + auth + hamburger */}
@@ -118,11 +132,22 @@ function Header({ darkMode, onToggleDark }) {
         aria-label="Mobile navigation"
         aria-hidden={!menuOpen}
       >
-        {navLinks.map(({ to, label }) => (
-          <NavLink key={to} to={to} onClick={() => setMenuOpen(false)}>
-            {label}
-          </NavLink>
-        ))}
+        {navLinks.map(({ to, label, match }) => {
+          const active = match
+            ? location.pathname.startsWith(match)
+            : location.pathname === to;
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              className={active ? "active" : undefined}
+              aria-current={active ? "page" : undefined}
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </NavLink>
+          );
+        })}
 
         <div className="mobile-nav-divider" />
 

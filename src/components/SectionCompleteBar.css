@@ -54,6 +54,17 @@
   opacity: 0.85;
 }
 
+.scb-mark-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.scb-error {
+  flex-basis: 100%;
+  font-size: 0.8rem;
+  color: #b84a2e;
+}
+
 .scb-next {
   background: var(--gold);
   border-radius: 8px;
