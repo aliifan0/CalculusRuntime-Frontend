@@ -100,12 +100,12 @@ function Header({ darkMode, onToggleDark }) {
           {darkMode ? (
             <>
               <Sun size={16} strokeWidth={2} />
-              <span>Light</span>
+              <span> Light</span>
             </>
           ) : (
             <>
               <Moon size={16} strokeWidth={2} />
-              <span>Dark</span>
+              <span> Dark</span>
             </>
           )}
         </button>
