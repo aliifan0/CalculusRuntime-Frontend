@@ -18,8 +18,16 @@
   color: var(--gold);
 }
 
+/* FIX: Active state mein background ko solid text ke sath contrast diya */
 .bookmark-btn--active {
-  background: rgba(194, 138, 46, 0.1);
+  background: var(--gold); /* Background ko poora gold kar diya */
   border-color: var(--gold);
-  color: var(--gold);
+  color: var(--bg-primary); /* Ya jo bhi aapke project ka solid dark/contrast text variable ho, taake text chamke */
+}
+
+/* Safe-side: Disabled state ko bhi handle kar letay hain */
+.bookmark-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--muted);
 }

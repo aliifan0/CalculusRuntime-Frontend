@@ -25,7 +25,7 @@ function BookmarkButton({ id, title, path }) {
       aria-label={bookmarked ? "Remove bookmark" : "Bookmark this page"}
       title={bookmarked ? "Remove bookmark" : "Bookmark this page"}
     >
-      <span aria-hidden="true">{bookmarked ? "🔖" : "☆"}</span>
+      <span aria-hidden="true">{bookmarked ? "★" : "☆"}</span>
       <span>{bookmarked ? "Bookmarked" : "Bookmark"}</span>
     </button>
   );

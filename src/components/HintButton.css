@@ -34,6 +34,9 @@
 .hint-system__btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  border-color: var(--line);
+  background: var(--paper-2);
+  color: var(--muted);
 }
 
 .hint-system__progress {

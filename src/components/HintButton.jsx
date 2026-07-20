@@ -1,8 +1,5 @@
 import "./HintButton.css";
 
-/**
- * Objective 12 — reusable step-by-step hint control.
- */
 export default function HintButton({
   onReveal,
   visibleCount = 0,
